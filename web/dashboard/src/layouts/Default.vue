@@ -2,8 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-layout-header>
       <q-toolbar
-        color="primary"
-        :glossy="$q.theme === 'mat'"
+        color="dark"
         :inverted="$q.theme === 'ios'"
       >
         <q-btn
@@ -12,53 +11,31 @@
           round
           @click="leftDrawerOpen = !leftDrawerOpen"
           aria-label="Menu"
-          icon="fas fa-bars"
-        />
+        >
+          <q-icon name="menu" />
+        </q-btn>
 
         <q-toolbar-title>
-          Quasar App
-          <div slot="subtitle">Running on Quasar v{{ $q.version }}</div>
+          Dashboard
         </q-toolbar-title>
       </q-toolbar>
     </q-layout-header>
 
-    <q-layout-drawer
-      v-model="leftDrawerOpen"
-      :content-class="$q.theme === 'mat' ? 'bg-grey-2' : null"
-    >
-      <q-list
-        no-border
-        link
-        inset-delimiter
-      >
+    <q-layout-drawer v-model="leftDrawerOpen" :content-class="$q.theme === 'mat' ? 'bg-grey-2' : null">
+      <q-list no-border link inset-delimiter>
         <q-list no-border link inset-delimiter>
           <q-list-header>Navigation</q-list-header>
           <q-item to="/" exact>
-            <q-item-side icon="fas fa-home" />
-            <q-item-main label="Home" />
+            <q-item-side icon="fas fa-home"/>
+            <q-item-main label="Home"/>
           </q-item>
-          <q-item to="/about">
-            <q-item-side icon="fas fa-info" />
-            <q-item-main label="About" />
+          <q-item @click.native="add_widget">
+            <q-item-side icon="fas fa-plus"/>
+            <q-item-main label="Add widgets"/>
           </q-item>
-
-          <q-item-separator />
-          <q-list-header>Essential Links</q-list-header>
-          <q-item @click.native="openURL('http://quasar-framework.org')">
-            <q-item-side icon="fas fa-graduation-cap" />
-            <q-item-main label="Docs" sublabel="quasar-framework.org"></q-item-main>
-          </q-item>
-          <q-item @click.native="openURL('https://discord.gg/5TDhbDg')">
-            <q-item-side icon="fas fa-comments" />
-            <q-item-main label="Discord Chat Channel" sublabel="https://discord.gg/5TDhbDg"></q-item-main>
-          </q-item>
-          <q-item @click.native="openURL('http://forum.quasar-framework.org')">
-            <q-item-side icon="far fa-clipboard" />
-            <q-item-main label="Forum" sublabel="forum.quasar-framework.org"></q-item-main>
-          </q-item>
-          <q-item @click.native="openURL('https://twitter.com/quasarframework')">
-            <q-item-side icon="fab fa-twitter" />
-            <q-item-main label="Twitter" sublabel="@quasarframework"></q-item-main>
+          <q-item @click.native="edit_mode">
+            <q-item-side icon="fas fa-edit"/>
+            <q-item-main label="Edit mode"/>
           </q-item>
         </q-list>
       </q-list>
@@ -72,15 +49,51 @@
 
 <script>
 import { openURL } from 'quasar'
+import QLayout from 'quasar-framework/src/components/layout/QLayout'
+import QPageContainer from 'quasar-framework/src/components/layout/QPageContainer'
+import QLayoutDrawer from 'quasar-framework/src/components/layout/QLayoutDrawer'
+import QList from 'quasar-framework/src/components/list/QList'
+import QItem from 'quasar-framework/src/components/list/QItem'
+import QItemMain from 'quasar-framework/src/components/list/QItemMain'
+import QItemSide from 'quasar-framework/src/components/list/QItemSide'
+import QListHeader from 'quasar-framework/src/components/list/QListHeader'
+import QItemSeparator from 'quasar-framework/src/components/list/QItemSeparator'
+import QLayoutHeader from 'quasar-framework/src/components/layout/QLayoutHeader'
+import QToolbar from 'quasar-framework/src/components/toolbar/QToolbar'
+import QToolbarTitle from 'quasar-framework/src/components/toolbar/QToolbarTitle'
+import QBtn from 'quasar-framework/src/components/btn/QBtn'
+import QIcon from 'quasar-framework/src/components/icon/QIcon'
 
 export default {
-  name: 'LayoutDefault',
+  name: 'Default',
+  components: {
+    QIcon,
+    QBtn,
+    QToolbarTitle,
+    QToolbar,
+    QLayoutHeader,
+    QItemSeparator,
+    QListHeader,
+    QItemSide,
+    QItemMain,
+    QItem,
+    QList,
+    QLayoutDrawer,
+    QPageContainer,
+    QLayout
+  },
   data () {
     return {
-      leftDrawerOpen: this.$q.platform.is.desktop
+      leftDrawerOpen: !this.$q.platform.is.desktop
     }
   },
   methods: {
+    add_widget () {
+      this.$store.state.toggle.add_widget = !this.$store.state.toggle.add_widget
+    },
+    edit_mode () {
+      this.$store.state.toggle.edit_mode = !this.$store.state.toggle.edit_mode
+    },
     openURL
   }
 }
