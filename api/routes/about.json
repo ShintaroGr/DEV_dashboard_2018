@@ -1,0 +1,122 @@
+{
+  "client":{
+    "host":"10.101.53.35"
+  },
+  "server":{
+    "current_time":1531680780,
+    "services":[
+      {
+        "name":"youtube",
+        "widgets":[
+          {
+            "name":"ChannelInfo",
+            "description":"Show channels informations",
+            "params":[
+              {
+                "name":"UserID",
+                "type":"string"
+              },
+              {
+                "name":"Refresh Timer",
+                "type":"integer"
+              }
+            ]
+          },
+          {
+            "name":"Comment List",
+            "description":"Show last comment on a video",
+            "params":[
+              {
+                "name":"Youtube Video Id",
+                "type":"string"
+              },
+              {
+                "name":"Max Comment",
+                "type":"integer"
+              },
+              {
+                "name":"Refresh Timer",
+                "type":"integer"
+              }
+            ]
+          },
+          {
+            "name":"Last Video Info",
+            "description":"Show last video information",
+            "params":[
+              {
+                "name":"UserId",
+                "type":"string"
+              },
+              {
+                "name":"Max Comment",
+                "type":"integer"
+              },
+              {
+                "name":"Refresh Timer",
+                "type":"integer"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name":"news",
+        "widgets":[
+          {
+            "name":"article_list",
+            "description":"Affichage de la liste des derniers articles",
+            "params":[
+              {
+                "name":"Keyword",
+                "type":"string"
+              },
+              {
+                "name":"Refresh Timer",
+                "type":"integer"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name":"reddit",
+        "widgets":[
+          {
+            "name":"Reddit Feed",
+            "description":"Affichage de la liste des derniers articles sur un feed reddit",
+            "params":[
+              {
+                "name":"Subreddit",
+                "type":"string"
+              },
+              {
+                "name":"Refresh Timer",
+                "type":"integer"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name":"weather",
+        "widgets":[
+          {
+            "name":"Temperatures & Weather",
+            "description":"Affichage des information météo par rapport à une ville",
+            "params":[
+              {
+                "name":"City",
+                "type":"string"
+              },
+              {
+                "name":"Refresh Timer",
+                "type":"integer"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
