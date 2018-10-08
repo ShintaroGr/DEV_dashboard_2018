@@ -9,7 +9,8 @@
         "name":"youtube",
         "widgets":[
           {
-            "name":"ChannelInfo",
+            "name":"Youtube Channel Info",
+            "url": "/api/widget/youtube/channel",
             "description":"Show channels informations",
             "params":[
               {
@@ -23,8 +24,9 @@
             ]
           },
           {
-            "name":"Comment List",
+            "name":"Last Youtube Video Comments",
             "description":"Show last comment on a video",
+            "url": "/api/widget/youtube/comment",
             "params":[
               {
                 "name":"Youtube Video Id",
@@ -41,8 +43,9 @@
             ]
           },
           {
-            "name":"Last Video Info",
+            "name":"Last Youtube Video Info",
             "description":"Show last video information",
+            "url": "/api/widget/youtube/video",
             "params":[
               {
                 "name":"UserId",
@@ -64,7 +67,9 @@
         "name":"news",
         "widgets":[
           {
-            "name":"article_list",
+            "name":"New York Times News",
+            "url": "/api/widget/news",
+
             "description":"Affichage de la liste des derniers articles",
             "params":[
               {
@@ -83,8 +88,9 @@
         "name":"reddit",
         "widgets":[
           {
-            "name":"Reddit Feed",
+            "name":"Subreddit Feed",
             "description":"Affichage de la liste des derniers articles sur un feed reddit",
+            "url": "/api/widget/reddit",
             "params":[
               {
                 "name":"Subreddit",
@@ -102,8 +108,29 @@
         "name":"weather",
         "widgets":[
           {
-            "name":"Temperatures & Weather",
+            "name":"Weather",
             "description":"Affichage des information météo par rapport à une ville",
+            "url": "/api/widget/weather",
+            "params":[
+              {
+                "name":"City",
+                "type":"string"
+              },
+              {
+                "name":"Refresh Timer",
+                "type":"integer"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name":"hogwarts",
+        "widgets":[
+          {
+            "name":"Hogwarts C Pool Scores",
+            "url": "/api/widget/hogwarts",
+            "description":"Affichage des information des score de piscine par rapport à une ville",
             "params":[
               {
                 "name":"City",

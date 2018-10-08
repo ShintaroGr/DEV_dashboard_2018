@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import toggle from './toggle'
+import user from './user'
+import server from './server'
 
 Vue.use(Vuex)
 
@@ -13,7 +15,9 @@ Vue.use(Vuex)
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      toggle
+      user,
+      toggle,
+      server
     }
   })
 

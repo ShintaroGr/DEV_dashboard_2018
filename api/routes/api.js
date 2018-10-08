@@ -55,11 +55,14 @@ router.post('/signup', (req, res) => {
   } else {
     const newUser = new User({
       username: req.body.username,
-      password: req.body.password
+      password: req.body.password,
+      name: req.body.name,
+      email: req.body.email
     })
     // save the user
     newUser.save(function (err) {
       if (err) {
+        console.log(err)
         return res.json({success: false, msg: 'Username already exists.'})
       }
       res.json({success: true, msg: 'Successful created new user.'})
