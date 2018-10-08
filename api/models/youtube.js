@@ -6,9 +6,7 @@ const YoutubeChannelSchema = new Schema({
     type: String,
     default: 'YoutubeChannel'
   },
-  api_url: {
-    type: String
-  },
+
   youtube_username: {
     type: String,
     required: true
@@ -17,15 +15,16 @@ const YoutubeChannelSchema = new Schema({
     type: Number,
     default: 300
   }
+}, { getters: true })
+
+YoutubeChannelSchema.virtual('api_url').get(function () {
+  return 'https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails,statistics&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk&forUsername=' + this.youtube_username
 })
 
 const YoutubeVideoCommentSchema = new Schema({
   type: {
     type: String,
     default: 'YoutubeVideoComment'
-  },
-  api_url: {
-    type: String
   },
   youtube_video: {
     type: String,
@@ -39,15 +38,16 @@ const YoutubeVideoCommentSchema = new Schema({
     type: Number,
     default: 300
   }
+}, { getters: true })
+
+YoutubeVideoCommentSchema.virtual('api_url').get(function () {
+  return 'https://www.googleapis.com/youtube/v3/commentThreads?videoId=' + this.youtube_video + '&part=snippet,replies&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk'
 })
 
 const YoutubeLastVideoSchema = new Schema({
   type: {
     type: String,
     default: 'YoutubeLastVideo'
-  },
-  api_url: {
-    type: String
   },
   youtube_username: {
     type: String,
@@ -57,6 +57,10 @@ const YoutubeLastVideoSchema = new Schema({
     type: Number,
     default: 300
   }
+}, { getters: true })
+
+YoutubeLastVideoSchema.virtual('api_url').get(function () {
+  return 'https://www.googleapis.com/youtube/v3/commentThreads?videoId=' + this.youtube_video + '&part=snippet,replies&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk'
 })
 
 module.exports = {

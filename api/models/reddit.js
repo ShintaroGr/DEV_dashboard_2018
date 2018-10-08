@@ -6,21 +6,26 @@ const RedditSchema = new Schema({
     type: String,
     default: 'Reddit'
   },
-  api_url: {
-    type: String
-  },
   subreddit: {
     type: String,
     required: true
   },
   max_article: {
     type: Number,
-    default: 20
+    default: 30
+  },
+  sort: {
+    type: String,
+    default: 'hot'
   },
   refresh: {
     type: Number,
     default: 300
   }
+}, { getters: true })
+
+RedditSchema.virtual('api_url').get(function () {
+  return 'https://www.reddit.com/r/' + this.subreddit + '/' + this.sort + '/.json?count=' + this.max_article
 })
 
 module.exports = mongoose.model('Reddit', RedditSchema)

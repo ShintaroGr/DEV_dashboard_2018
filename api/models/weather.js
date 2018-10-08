@@ -6,9 +6,6 @@ const WeatherSchema = new Schema({
     type: String,
     default: 'Weather'
   },
-  api_url: {
-    type: String
-  },
   city: {
     type: String,
     required: true
@@ -17,6 +14,9 @@ const WeatherSchema = new Schema({
     type: Number,
     default: 300
   }
-})
+}, { getters: true })
 
+WeatherSchema.virtual('api_url').get(function () {
+  return 'http://api.openweathermap.org/data/2.5/weather?q=' + this.city + '&APPID=e31be7fe3713edd678459b857975892b&units=metric'
+})
 module.exports = mongoose.model('Weather', WeatherSchema)
