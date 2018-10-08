@@ -6,7 +6,6 @@ const HogwartsSchema = new Schema({
     type: String,
     default: 'Hogwarts'
   },
-
   city: {
     type: String,
     required: true,
@@ -16,7 +15,10 @@ const HogwartsSchema = new Schema({
     type: Number,
     default: 300
   }
-}, { getters: true })
+})
+
+HogwartsSchema
+  .set('toObject', { getters: true })
 
 HogwartsSchema.virtual('api_url').get(function () {
   return 'https://hogwarts.epitest.eu/ajax/' + this.city

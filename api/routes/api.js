@@ -11,6 +11,7 @@ const Youtube = require('../models/youtube')
 const News = require('../models/news')
 const Weather = require('../models/weather')
 const Reddit = require('../models/reddit')
+const Hogwarts = require('../models/hogwarts')
 const request = require('request')
 let aboutJson = require('./about')
 
@@ -119,7 +120,7 @@ router.get('/widget/:id', passport.authenticate('jwt', {session: false}), (req, 
       .populate({path: 'item', select: '-__v'})
       .exec(function (err, widget) {
         if (err) throw err
-        res.json(widget)
+        res.json(widget.item)
       })
   } else {
     return res.status(403).send({success: false, msg: 'Unauthorized.'})
@@ -176,9 +177,12 @@ router.get('/widget/:id/data', passport.authenticate('jwt', {session: false}), (
         if (err) throw err
         request({
           url: widget.item.api_url,
-          json: true
-        }, {timeout: 1500}, function (error, response, body) {
+          json: true,
+          timeout: 5000
+        }, function (error, response, body) {
           if (!error && response.statusCode === 200) {
+            res.json(body)
+          } else {
             res.json(body)
           }
         })
@@ -232,7 +236,7 @@ router.post('/widget/youtube/video', passport.authenticate('jwt', {session: fals
     const newWidget = new Youtube.Video({
       youtube_username: req.body.youtube_username,
       max_comment: req.body.max_comment,
-      refresh: req.body.refresh,
+      refresh: req.body.refresh
     })
     newWidget.save(function (err) {
       if (err) {
@@ -305,13 +309,13 @@ router.post('/widget/reddit', passport.authenticate('jwt', {session: false}), (r
 router.post('/widget/hogwarts', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
-    const newWidget = new Reddit({
+    const newWidget = new Hogwarts({
       city: req.body.city,
       refresh: req.body.refresh
     })
     newWidget.save(function (err) {
       if (err) {
-        return res.json({success: false, msg: 'New widget cannot be saved.'})
+        return res.json(err)
       }
       saveWidgetID(token, newWidget, res)
     })
