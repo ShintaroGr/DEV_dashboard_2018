@@ -7,9 +7,9 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - api
-  api:
-    container_name: api
+      - server
+  server:
+    container_name: server
     restart: always
     build: ./api
     ports:
