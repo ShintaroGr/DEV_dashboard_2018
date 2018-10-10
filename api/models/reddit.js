@@ -10,13 +10,13 @@ const RedditSchema = new Schema({
     type: String,
     required: true
   },
-  max_article: {
-    type: Number,
-    default: 30
-  },
   sort: {
     type: String,
     default: 'hot'
+  },
+  max_article: {
+    type: Number,
+    default: 30
   },
   refresh: {
     type: Number,

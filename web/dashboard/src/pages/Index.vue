@@ -1,4 +1,5 @@
 <template>
+  <div>
   <q-modal v-model="add_widget" :content-css="{minWidth: '80vw', minHeight: '80vh'}">
     <q-modal-layout>
       <q-toolbar slot="header" color="dark">
@@ -14,7 +15,7 @@
           float-label="Choose a widget type"
         />
         <div>
-          <q-input v-for="params in widgetParams" :key="params.name" v-model="text[params.name]" :float-label="params.name" :type="paramType(params.type)"></q-input>
+          <q-input v-for="params in widgetParams" :key="params.name" v-model="text[params.value]" :float-label="params.name" :type="paramType(params.type)"></q-input>
         </div>
         <div class="row q-mt-md">
           <q-btn v-if="widgetParams" @click="validWidget" icon="fas fa-check"><span style="margin-left: 10px"></span>Create widget</q-btn>
@@ -22,6 +23,10 @@
       </div>
     </q-modal-layout>
   </q-modal>
+    <div class="row">
+        <div v-for="widget in widgets" :key="widget._id" :is="widget.type" :widgetId="widget._id"></div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -32,10 +37,13 @@ import QBtn from 'quasar-framework/src/components/btn/QBtn'
 import QToolbar from 'quasar-framework/src/components/toolbar/QToolbar'
 import QToolbarTitle from 'quasar-framework/src/components/toolbar/QToolbarTitle'
 import QInput from 'quasar-framework/src/components/input/QInput'
+import Weather from '../components/weather'
+import News from '../components/news'
+import Hogwarts from '../components/hogwarts'
 
 export default {
   name: 'PageIndex',
-  components: { QInput, QToolbarTitle, QToolbar, QBtn, QModalLayout, QModal, QSelect },
+  components: {Hogwarts, News, Weather, QInput, QToolbarTitle, QToolbar, QBtn, QModalLayout, QModal, QSelect},
   data () {
     return {
       select: '',
@@ -44,11 +52,14 @@ export default {
       services: '',
       widgetParams: '',
       widgetUrl: '',
-      text: []
+      text: {},
+      widgets: ''
     }
   },
   mounted () {
-    this.$axios.get(this.$store.state.server.url + '/api/about')
+    this.$axios.defaults.headers.common['Authorization'] = this.$q.cookies.get('token')
+    this.$axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
+    this.$axios.get(this.$store.state.server.url + '/about.json')
       .then((response) => {
         this.services = response.data.server.services
         for (let service of response.data.server.services) {
@@ -65,6 +76,19 @@ export default {
           icon: 'report_problem'
         })
       })
+
+    this.$axios.get(this.$store.state.server.url + '/widget', { headers: { Authorization: this.$q.cookies.get('token') } })
+      .then((response) => {
+        this.widgets = response.data
+      })
+      .catch(() => {
+        this.$q.notify({
+          color: 'negative',
+          position: 'top',
+          message: 'Loading failed',
+          icon: 'report_problem'
+        })
+      })
   },
   methods: {
     onSelection (val) {
@@ -72,8 +96,36 @@ export default {
       this.widgetUrl = this.services.find(service => service.name === val.split('.')[0]).widgets.find(widget => widget.name === val.split('.')[1]).url
     },
     validWidget () {
-      console.log(this.text)
-      console.log(this.widgetUrl)
+      this.$axios.post(this.$store.state.server.url + this.widgetUrl, this.text)
+        .then((response) => {
+          if (response.data.success) {
+            this.$q.notify({
+              color: 'positive',
+              position: 'top',
+              message: response.data.msg,
+              icon: 'success'
+            })
+            this.$router.go({
+              path: '/',
+              force: true
+            })
+          } else {
+            this.$q.notify({
+              color: 'negative',
+              position: 'top',
+              message: response.data.msg,
+              icon: 'report_problem'
+            })
+          }
+        })
+        .catch(() => {
+          this.$q.notify({
+            color: 'negative',
+            position: 'top',
+            message: 'Loading failed',
+            icon: 'report_problem'
+          })
+        })
     },
     paramType (type) {
       return type === 'integer' ? 'number' : 'text'

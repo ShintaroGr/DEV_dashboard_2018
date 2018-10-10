@@ -21,6 +21,10 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/Login.vue') }
     ]
+  },
+  {
+    path: '/about.json',
+    component: () => import('layouts/About.vue')
   }
 ]
 

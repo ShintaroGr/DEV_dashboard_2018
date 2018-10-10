@@ -13,6 +13,7 @@ const Weather = require('../models/weather')
 const Reddit = require('../models/reddit')
 const Hogwarts = require('../models/hogwarts')
 const request = require('request')
+
 let aboutJson = require('./about')
 
 function getToken (headers) {
@@ -43,7 +44,7 @@ function saveWidgetID (token, newWidget, res) {
   })
 }
 
-router.get('/about', (req, res) => {
+router.get('/about.json', (req, res) => {
   aboutJson.client.host = req.connection.remoteAddress.split(':')[2] === '1' ? '127.0.0.1' : req.socket.remoteAddress.split(':')[3]
   aboutJson.server.current_time = Date.now()
   res.json(aboutJson)
@@ -219,8 +220,7 @@ router.post('/widget/youtube/comment', passport.authenticate('jwt', {session: fa
     const newWidget = new Youtube.Comment({
       youtube_video: req.body.youtube_video,
       max_comment: req.body.max_comment,
-      refresh: req.body.refresh,
-      api_url: 'https://www.googleapis.com/youtube/v3/commentThreads?videoId=' + req.body.youtube_video + '&part=snippet,replies&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk'
+      refresh: req.body.refresh
     })
     newWidget.save(function (err) {
       if (err) {

@@ -64,7 +64,7 @@ export default {
     QSelect },
   data () {
     return {
-      registerForm: true,
+      registerForm: false,
       name: '',
       email: '',
       username: '',
@@ -82,10 +82,12 @@ export default {
       this.registerForm = !this.registerForm
     },
     login () {
-      this.$axios.post(this.$store.state.server.url + '/api/signin', {
+      this.$axios.post(this.$store.state.server.url + '/signin', {
         username: this.username,
         password: this.password
       }).then((response) => {
+        this.$axios.defaults.headers.common['Authorization'] = response.data.token
+        this.$axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
         this.$q.cookies.set('token', response.data.token)
         this.$store.state.user.token = response.data.token
         this.$router.push({ path: `/` })
@@ -101,7 +103,7 @@ export default {
         })
     },
     register () {
-      this.$axios.post(this.$store.state.server.url + '/api/signup', {
+      this.$axios.post(this.$store.state.server.url + '/signup', {
         username: this.username,
         password: this.password,
         email: this.email,

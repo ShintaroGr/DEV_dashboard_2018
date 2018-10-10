@@ -10,54 +10,70 @@
         "widgets":[
           {
             "name":"Youtube Channel Info",
-            "url": "/api/widget/youtube/channel",
+            "url": "/widget/youtube/channel",
             "description":"Show channels informations",
             "params":[
               {
                 "name":"UserID",
-                "type":"string"
+                "type":"string",
+                "value": "youtube_username",
+                "required": true
               },
               {
                 "name":"Refresh Timer",
-                "type":"integer"
+                "type":"integer",
+                "value": "refresh",
+                "required": false
               }
             ]
           },
           {
             "name":"Last Youtube Video Comments",
             "description":"Show last comment on a video",
-            "url": "/api/widget/youtube/comment",
+            "url": "/widget/youtube/comment",
             "params":[
               {
                 "name":"Youtube Video Id",
-                "type":"string"
+                "type":"string",
+                "value": "youtube_video",
+                "required": true
               },
               {
                 "name":"Max Comment",
-                "type":"integer"
+                "type":"integer",
+                "value": "max_comment",
+                "required":  false
               },
               {
                 "name":"Refresh Timer",
-                "type":"integer"
+                "type":"integer",
+                "value": "refresh",
+                "required": false
               }
             ]
           },
           {
             "name":"Last Youtube Video Info",
             "description":"Show last video information",
-            "url": "/api/widget/youtube/video",
+            "url": "/widget/youtube/video",
             "params":[
               {
                 "name":"UserId",
-                "type":"string"
+                "type":"string",
+                "value": "youtube_username",
+                "required": true
               },
               {
                 "name":"Max Comment",
-                "type":"integer"
+                "value": "max_comment",
+                "type":"integer",
+                "required": false
               },
               {
                 "name":"Refresh Timer",
-                "type":"integer"
+                "value": "refresh",
+                "type":"integer",
+                "required": true
               }
             ]
           }
@@ -68,17 +84,21 @@
         "widgets":[
           {
             "name":"New York Times News",
-            "url": "/api/widget/news",
+            "url": "/widget/news",
 
             "description":"Affichage de la liste des derniers articles",
             "params":[
               {
                 "name":"Keyword",
-                "type":"string"
+                "type":"string",
+                "value": "keyword",
+                "required": false
               },
               {
                 "name":"Refresh Timer",
-                "type":"integer"
+                "type":"integer",
+                "value": "refresh",
+                "required": false
               }
             ]
           }
@@ -90,15 +110,31 @@
           {
             "name":"Subreddit Feed",
             "description":"Affichage de la liste des derniers articles sur un feed reddit",
-            "url": "/api/widget/reddit",
+            "url": "/widget/reddit",
             "params":[
               {
                 "name":"Subreddit",
-                "type":"string"
+                "type":"string",
+                "value": "subreddit",
+                "required": true
               },
               {
                 "name":"Refresh Timer",
-                "type":"integer"
+                "value": "refresh",
+                "type":"integer",
+                "required": false
+              },
+              {
+                "name":  "Max Article",
+                "type": "integer",
+                "value": "max_article",
+                "required": false
+              },
+              {
+                "name":  "Sort",
+                "type": "string",
+                "value": "sort",
+                "required": false
               }
             ]
           }
@@ -110,15 +146,19 @@
           {
             "name":"Weather",
             "description":"Affichage des information météo par rapport à une ville",
-            "url": "/api/widget/weather",
+            "url": "/widget/weather",
             "params":[
               {
                 "name":"City",
-                "type":"string"
+                "value": "city",
+                "type":"string",
+                "required": false
               },
               {
                 "name":"Refresh Timer",
-                "type":"integer"
+                "value": "refresh",
+                "type":"integer",
+                "required": false
               }
             ]
           }
@@ -129,16 +169,20 @@
         "widgets":[
           {
             "name":"Hogwarts C Pool Scores",
-            "url": "/api/widget/hogwarts",
+            "url": "/widget/hogwarts",
             "description":"Affichage des information des score de piscine par rapport à une ville",
             "params":[
               {
                 "name":"City",
-                "type":"string"
+                "value": "city",
+                "type":"string",
+                "required": true
               },
               {
                 "name":"Refresh Timer",
-                "type":"integer"
+                "value": "refresh",
+                "type":"integer",
+                "required": false
               }
             ]
           }
