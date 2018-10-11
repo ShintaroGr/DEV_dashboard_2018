@@ -16,7 +16,7 @@
               {
                 "name":"UserID",
                 "type":"string",
-                "value": "youtube_username",
+                "value": "youtube_name",
                 "required": true
               },
               {
@@ -60,14 +60,8 @@
               {
                 "name":"UserId",
                 "type":"string",
-                "value": "youtube_username",
+                "value": "youtube_name",
                 "required": true
-              },
-              {
-                "name":"Max Comment",
-                "value": "max_comment",
-                "type":"integer",
-                "required": false
               },
               {
                 "name":"Refresh Timer",

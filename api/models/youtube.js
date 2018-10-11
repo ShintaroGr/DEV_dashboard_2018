@@ -6,8 +6,7 @@ const YoutubeChannelSchema = new Schema({
     type: String,
     default: 'YoutubeChannel'
   },
-
-  youtube_username: {
+  youtube_id: {
     type: String,
     required: true
   },
@@ -18,7 +17,7 @@ const YoutubeChannelSchema = new Schema({
 }, { getters: true })
 
 YoutubeChannelSchema.virtual('api_url').get(function () {
-  return 'https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails,statistics&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk&forUsername=' + this.youtube_username
+  return 'https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails,statistics&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk&id=' + this.youtube_id
 })
 
 const YoutubeVideoCommentSchema = new Schema({
@@ -49,7 +48,7 @@ const YoutubeLastVideoSchema = new Schema({
     type: String,
     default: 'YoutubeLastVideo'
   },
-  youtube_username: {
+  youtube_id: {
     type: String,
     required: true
   },
@@ -60,7 +59,7 @@ const YoutubeLastVideoSchema = new Schema({
 }, { getters: true })
 
 YoutubeLastVideoSchema.virtual('api_url').get(function () {
-  return 'https://www.googleapis.com/youtube/v3/commentThreads?videoId=' + this.youtube_video + '&part=snippet,replies&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk'
+  return 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + this.youtube_id + '&maxResults=1&order=date&type=video&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk'
 })
 
 module.exports = {

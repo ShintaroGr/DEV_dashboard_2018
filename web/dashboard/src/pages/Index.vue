@@ -23,7 +23,7 @@
       </div>
     </q-modal-layout>
   </q-modal>
-    <div class="row">
+    <div class="row masonry">
         <div v-for="widget in widgets" :key="widget._id" :is="widget.type" :widgetId="widget._id"></div>
     </div>
   </div>
@@ -40,10 +40,26 @@ import QInput from 'quasar-framework/src/components/input/QInput'
 import Weather from '../components/weather'
 import News from '../components/news'
 import Hogwarts from '../components/hogwarts'
+import Reddit from '../components/reddit'
+import YoutubeChannel from '../components/youtubeChannel'
+import YoutubeLastVideo from '../components/youtubeLastVideo'
 
 export default {
   name: 'PageIndex',
-  components: {Hogwarts, News, Weather, QInput, QToolbarTitle, QToolbar, QBtn, QModalLayout, QModal, QSelect},
+  components: {
+    YoutubeLastVideo,
+    YoutubeChannel,
+    Reddit,
+    Hogwarts,
+    News,
+    Weather,
+    QInput,
+    QToolbarTitle,
+    QToolbar,
+    QBtn,
+    QModalLayout,
+    QModal,
+    QSelect},
   data () {
     return {
       select: '',
@@ -151,3 +167,12 @@ export default {
   }
 }
 </script>
+
+<style>
+  .masonry {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 100vw;
+  }
+</style>

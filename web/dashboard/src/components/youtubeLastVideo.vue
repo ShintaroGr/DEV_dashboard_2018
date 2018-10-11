@@ -1,103 +1,78 @@
 <template>
-  <div class="col-xs-12 col-md-6 col-lg-4">
+  <div class="col-xs-12 col-md-6 col-lg-4" v-if="data.items">
     <q-modal v-model="edit">
-    <q-modal-layout>
-      <q-toolbar slot="header" color="dark">
-        <q-toolbar-title>
-          Edit widget
-        </q-toolbar-title>
-      </q-toolbar>
-      <div class="layout-padding">
-        <div v-for="(info, index) in infos" :key="index">
-          <div v-if="index !== '_id' && index !== 'type'">
-            <q-input v-model="infos[index]" :float-label="index" :type="paramType(infos[index])"></q-input>
+      <q-modal-layout>
+        <q-toolbar slot="header" color="dark">
+          <q-toolbar-title>
+            Edit widget
+          </q-toolbar-title>
+        </q-toolbar>
+        <div class="layout-padding">
+          <div v-for="(info, index) in infos" :key="index">
+            <div v-if="index !== '_id' && index !== 'type'">
+              <q-input v-model="infos[index]" :float-label="index" :type="paramType(infos[index])"></q-input>
+            </div>
           </div>
+          <q-btn color="primary" @click="validateEdit">Validate</q-btn>
         </div>
-        <q-btn color="primary" @click="validateEdit">Validate</q-btn>
-      </div>
-    </q-modal-layout>
+      </q-modal-layout>
     </q-modal>
     <q-card>
-      <q-card-title>
-        {{ weather.city }}
-        <div v-if="$store.state.toggle.edit_mode" style="float: right">
-          <q-btn @click="edit = true" color="primary" icon="fas fa-edit"></q-btn>
-          <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" ></q-btn>
-        </div>
-      </q-card-title>
-      <q-card-separator />
-      <q-card-main style="margin-top: 10px">
-        <div class="row">
-          <div class="col-7">
-            <div class="row">
-              <div class="col-xs-12 col-sm-5"><i :class="'fa-4x wi wi-owm-' + weather.time + '-' + weather.id "></i></div>
-              <div class="col-xs-12 col-sm-7"><h2 style="margin: 10px 0">{{weather.temperature}}°C</h2></div>
-            </div>
-          </div>
-          <div class="col-5">
-            <div class="row">
-              <p>
-                Humidity : {{weather.humidity}}%
-              </p>
-            </div>
-            <div class="row">
-              <p>
-                Wind Speed : {{weather.windSpeed}} km/h
-              </p>
-            </div>
-            <div class="row">
-              <p>
-                Pressure : {{weather.pressure}} hPa
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="row justify-center">
-          <h4 class="capitalize" style="margin: 0;">
-            {{ weather.description}}
-          </h4>
-        </div>
+      <q-card-main>
+        <iframe width="100%" height="315"
+                :src="'https://www.youtube.com/embed/' + data.items[0].id.videoId" >
+        </iframe>
       </q-card-main>
     </q-card>
   </div>
 </template>
 
 <script>
+import QList from 'quasar-framework/src/components/list/QList'
+import QCollapsible from 'quasar-framework/src/components/collapsible/QCollapsible'
+import QScrollArea from 'quasar-framework/src/components/scroll-area/QScrollArea'
 import QCard from 'quasar-framework/src/components/card/QCard'
 import QCardTitle from 'quasar-framework/src/components/card/QCardTitle'
 import QCardSeparator from 'quasar-framework/src/components/card/QCardSeparator'
 import QCardMain from 'quasar-framework/src/components/card/QCardMain'
 import QBtn from 'quasar-framework/src/components/btn/QBtn'
-import QModalLayout from 'quasar-framework/src/components/modal/QModalLayout'
+import { openURL } from 'quasar'
 import QModal from 'quasar-framework/src/components/modal/QModal'
+import QModalLayout from 'quasar-framework/src/components/modal/QModalLayout'
 import QToolbar from 'quasar-framework/src/components/toolbar/QToolbar'
 import QToolbarTitle from 'quasar-framework/src/components/toolbar/QToolbarTitle'
-import QSearch from 'quasar-framework/src/components/search/QSearch'
 import QInput from 'quasar-framework/src/components/input/QInput'
+import QIcon from 'quasar-framework/src/components/icon/QIcon'
+
 export default {
-  name: 'weather',
+  name: 'YoutubeLastVideo',
   components: {
+    QIcon,
     QInput,
-    QSearch,
     QToolbarTitle,
     QToolbar,
-    QModal,
     QModalLayout,
+    QModal,
     QBtn,
     QCardMain,
     QCardSeparator,
     QCardTitle,
-    QCard},
+    QCard,
+    QScrollArea,
+    QCollapsible,
+    QList
+  },
   data () {
     return {
       edit: false,
       infos: Object,
       data: Object,
-      weather: {},
+      channelInfo: Array,
       refreshTimer: 300
     }
   },
   methods: {
+    openURL,
     validateEdit () {
       this.$axios.put(this.$store.state.server.url + '/widget/' + this.widgetId, this.infos)
         .then((response) => {
@@ -187,17 +162,11 @@ export default {
       this.$axios.get(this.$store.state.server.url + '/widget/' + this.widgetId + '/data')
         .then((response) => {
           this.data = response.data
-          this.weather.description = response.data.weather[0].description
-          this.weather.id = response.data.weather[0].id
-          this.weather.time = response.data.weather[0].icon[2] === 'n' ? 'night' : 'day'
-          this.weather.temperature = Math.round(response.data.main.temp)
-          this.weather.pressure = response.data.main.pressure
-          this.weather.humidity = response.data.main.humidity
-          this.weather.windSpeed = response.data.wind.speed
-          this.weather.city = response.data.name
+          console.log(this.data)
           this.$forceUpdate()
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log(error)
           this.$q.notify({
             color: 'negative',
             position: 'top',

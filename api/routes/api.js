@@ -195,19 +195,31 @@ router.get('/widget/:id/data', passport.authenticate('jwt', {session: false}), (
     return res.status(403).send({success: false, msg: 'Unauthorized.'})
   }
 })
-
+// https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&maxResults=1&q=(Sivhd)&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk
 router.post('/widget/youtube/channel', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
-    const newWidget = new Youtube.Channel({
-      youtube_username: req.body.youtube_username,
-      refresh: req.body.refresh
-    })
-    newWidget.save(function (err) {
-      if (err) {
-        return res.json({success: false, msg: 'New widget cannot be saved.'})
+    request({
+      url: 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&maxResults=1&q=(' + req.body.youtube_name + ')&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk',
+      json: true,
+      timeout: 5000
+    }, function (error, response, body) {
+      if (!error && response.statusCode === 200) {
+        const newWidget = new Youtube.Channel({
+          youtube_id: body.items[0].id.channelId,
+          youtube_name: req.body.youtube_name,
+          refresh: req.body.refresh
+        })
+        newWidget.save(function (err) {
+          if (err) {
+            console.log(err)
+            return res.json({success: false, msg: 'New widget cannot be saved.'})
+          }
+          saveWidgetID(token, newWidget, res)
+        })
+      } else {
+        return res.json({success: false, msg: 'Unknown youtube user'})
       }
-      saveWidgetID(token, newWidget, res)
     })
   } else {
     return res.status(403).send({success: false, msg: 'Unauthorized.'})
@@ -236,16 +248,27 @@ router.post('/widget/youtube/comment', passport.authenticate('jwt', {session: fa
 router.post('/widget/youtube/video', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
-    const newWidget = new Youtube.Video({
-      youtube_username: req.body.youtube_username,
-      max_comment: req.body.max_comment,
-      refresh: req.body.refresh
-    })
-    newWidget.save(function (err) {
-      if (err) {
-        return res.json({success: false, msg: 'New widget cannot be saved.'})
+    request({
+      url: 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&maxResults=1&q=(' + req.body.youtube_name + ')&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk',
+      json: true,
+      timeout: 5000
+    }, function (error, response, body) {
+      if (!error && response.statusCode === 200) {
+        const newWidget = new Youtube.Video({
+          youtube_id: body.items[0].id.channelId,
+          youtube_name: req.body.youtube_name,
+          max_comment: req.body.max_comment,
+          refresh: req.body.refresh
+        })
+        newWidget.save(function (err) {
+          if (err) {
+            return res.json({success: false, msg: 'New widget cannot be saved.'})
+          }
+          saveWidgetID(token, newWidget, res)
+        })
+      } else {
+        return res.json({success: false, msg: 'Unknown youtube user'})
       }
-      saveWidgetID(token, newWidget, res)
     })
   } else {
     return res.status(403).send({success: false, msg: 'Unauthorized.'})
