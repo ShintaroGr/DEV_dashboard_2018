@@ -3,7 +3,7 @@
 Dashboard EPITECH (*Web*)
 =================
 
-Just another web dashboard [(see demo)](http://dashboard.shintaro.ovh)
+Just another web dashboard
 
 List of functionalities:
   * For youtube :
@@ -60,6 +60,14 @@ benoit.hoffman@epitech.eu
 **Documentation**
 -------
 
+###Launch the application
+
+* Install docker & docker-compose
+* Clone this repository
+* Run at the root of the directory
+   * > docker-compose build && docker-compose up -d
+* Go on the [Documentation](http://localhost:80), on the [Application](http://localhost:8000), or on the [API](http://localhost:8080/about.json)
+ 
 
 ###Create widget
 
