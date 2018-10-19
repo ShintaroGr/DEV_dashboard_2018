@@ -8,12 +8,17 @@ const HogwartsSchema = new Schema({
   },
   city: {
     type: String,
-    required: true,
-    enum: ['lil', 'par']
+    default: '',
+    enum: ['', 'run', 'bru', 'tir', 'bar', 'tls', 'stg', 'ren', 'par', 'nce', 'nan', 'ncy',
+      'mpl', 'mar', 'lyn', 'bdx', 'lil']
   },
   refresh: {
     type: Number,
     default: 300
+  },
+  position: {
+    type: Number,
+    default: 0
   }
 })
 

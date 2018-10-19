@@ -14,6 +14,10 @@ const WidgetSchema = new Schema({
   onModel: {
     type: String,
     required: true
+  },
+  position: {
+    type: Number,
+    default: 0
   }
 })
 

@@ -28,31 +28,6 @@
             ]
           },
           {
-            "name":"Last Youtube Video Comments",
-            "description":"Show last comment on a video",
-            "url": "/widget/youtube/comment",
-            "params":[
-              {
-                "name":"Youtube Video Id",
-                "type":"string",
-                "value": "youtube_video",
-                "required": true
-              },
-              {
-                "name":"Max Comment",
-                "type":"integer",
-                "value": "max_comment",
-                "required":  false
-              },
-              {
-                "name":"Refresh Timer",
-                "type":"integer",
-                "value": "refresh",
-                "required": false
-              }
-            ]
-          },
-          {
             "name":"Last Youtube Video Info",
             "description":"Show last video information",
             "url": "/widget/youtube/video",
@@ -169,6 +144,92 @@
               {
                 "name":"City",
                 "value": "city",
+                "type":"string",
+                "required": true
+              },
+              {
+                "name":"Refresh Timer",
+                "value": "refresh",
+                "type":"integer",
+                "required": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name":"movie",
+        "widgets":[
+          {
+            "name":"Movie List",
+            "url": "/widget/movies",
+            "description":"Affichage des films",
+            "params":[
+              {
+                "name":"Sorting",
+                "value": "sort",
+                "type":"string",
+                "required": true
+              },
+              {
+                "name":"Refresh Timer",
+                "value": "refresh",
+                "type":"integer",
+                "required": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name":"guildwars",
+        "widgets":[
+          {
+            "name":"Guild Wars 2 Gems Exchange",
+            "url": "/widget/guildwars2/gems",
+            "description":"Affichage des taux de change",
+            "params":[
+              {
+                "name":"Gems Or coins",
+                "value": "gems_or_coins",
+                "type":"string",
+                "required": true
+              },
+              {
+                "name":"Refresh Timer",
+                "value": "refresh",
+                "type":"integer",
+                "required": false
+              }
+            ]
+          },
+          {
+            "name":"Guild Wars 2 Delivery",
+            "url": "/widget/guildwars2/delivery",
+            "description":"Affichage de vos objet au Lion noir",
+            "params":[
+              {
+                "name":"Api Key",
+                "value": "api_key",
+                "type":"string",
+                "required": true
+              },
+              {
+                "name":"Refresh Timer",
+                "value": "refresh",
+                "type":"integer",
+                "required": false
+              }
+            ]
+          },
+          {
+            "name":"Guild Wars 2 Wallet",
+            "url": "/widget/guildwars2/wallet",
+            "description":"Affichage de vos monnaies",
+            "params":[
+              {
+                "name":"Api Key",
+                "value": "api_key",
                 "type":"string",
                 "required": true
               },

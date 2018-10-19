@@ -21,6 +21,10 @@ const RedditSchema = new Schema({
   refresh: {
     type: Number,
     default: 300
+  },
+  position: {
+    type: Number,
+    default: 0
   }
 }, { getters: true })
 

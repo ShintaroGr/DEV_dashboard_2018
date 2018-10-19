@@ -12,6 +12,8 @@ const News = require('../models/news')
 const Weather = require('../models/weather')
 const Reddit = require('../models/reddit')
 const Hogwarts = require('../models/hogwarts')
+const Movie = require('../models/movie')
+const GuildWars = require('../models/guildwars2')
 const request = require('request')
 
 let aboutJson = require('./about')
@@ -109,6 +111,7 @@ router.get('/widget', passport.authenticate('jwt', {session: false}), (req, res)
           for (let item of widget) {
             widgets.push(item.item)
           }
+          widgets.sort((a, b) => { return (a.position - b.position) })
           res.status(200).json(widgets)
         }
       })
@@ -124,7 +127,11 @@ router.get('/widget/:id', passport.authenticate('jwt', {session: false}), (req, 
       .populate({path: 'item', select: '-__v'})
       .exec(function (err, widget) {
         if (err) throw err
-        res.json(widget.item)
+        if (widget) {
+          res.json(widget.item)
+        } else {
+          res.status(500).send({success: false, msg: 'Something went wrong.'})
+        }
       })
   } else {
     return res.status(403).send({success: false, msg: 'Unauthorized.'})
@@ -179,6 +186,9 @@ router.get('/widget/:id/data', passport.authenticate('jwt', {session: false}), (
       .populate({path: 'item', select: '-__v'})
       .exec(function (err, widget) {
         if (err) throw err
+        if (!widget) {
+          return res.status(200)
+        }
         request({
           url: widget.item.api_url,
           json: true,
@@ -344,6 +354,135 @@ router.post('/widget/hogwarts', passport.authenticate('jwt', {session: false}), 
         return res.json(err)
       }
       saveWidgetID(token, newWidget, res)
+    })
+  } else {
+    return res.status(403).send({success: false, msg: 'Unauthorized.'})
+  }
+})
+
+router.post('/widget/movies', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const token = getToken(req.headers)
+  if (token) {
+    const newWidget = new Movie({
+      sort: req.body.sort,
+      refresh: req.body.refresh
+    })
+    newWidget.save(function (err) {
+      if (err) {
+        return res.json(err)
+      }
+      saveWidgetID(token, newWidget, res)
+    })
+  } else {
+    return res.status(403).send({success: false, msg: 'Unauthorized.'})
+  }
+})
+
+router.post('/widget/guildwars2/gems', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const token = getToken(req.headers)
+  if (token) {
+    const newWidget = new GuildWars.Gems({
+      gems_or_coins: req.body.gems_or_coins,
+      refresh: req.body.refresh
+    })
+    newWidget.save(function (err) {
+      if (err) {
+        return res.json(err)
+      }
+      saveWidgetID(token, newWidget, res)
+    })
+  } else {
+    return res.status(403).send({success: false, msg: 'Unauthorized.'})
+  }
+})
+
+router.post('/widget/guildwars2/delivery', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const token = getToken(req.headers)
+  if (token) {
+    const newWidget = new GuildWars.Delivery({
+      api_key: req.body.api_key,
+      refresh: req.body.refresh
+    })
+    newWidget.save(function (err) {
+      if (err) {
+        return res.json(err)
+      }
+      saveWidgetID(token, newWidget, res)
+    })
+  } else {
+    return res.status(403).send({success: false, msg: 'Unauthorized.'})
+  }
+})
+
+router.get('/widget/guildwars2/delivery/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const token = getToken(req.headers)
+  if (token) {
+    request({
+      url: 'https://api.guildwars2.com/v2/items/' + req.params.id,
+      json: true,
+      timeout: 5000
+    }, function (error, response, body) {
+      if (!error && response.statusCode === 200) {
+        return res.status(200).json(response.body)
+      } else {
+        return res.json({success: false, msg: 'Unknown youtube user'})
+      }
+    })
+  } else {
+    return res.status(403).send({success: false, msg: 'Unauthorized.'})
+  }
+})
+
+router.get('/widget/guildwars2/delivery/:id/prices', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const token = getToken(req.headers)
+  if (token) {
+    request({
+      url: 'https://api.guildwars2.com/v2/commerce/prices/' + req.params.id,
+      json: true,
+      timeout: 5000
+    }, function (error, response, body) {
+      if (!error && response.statusCode === 200) {
+        return res.status(200).json(response.body)
+      } else {
+        return res.json({success: false, msg: 'Unknown youtube user'})
+      }
+    })
+  } else {
+    return res.status(403).send({success: false, msg: 'Unauthorized.'})
+  }
+})
+
+router.post('/widget/guildwars2/wallet', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const token = getToken(req.headers)
+  if (token) {
+    const newWidget = new GuildWars.Wallet({
+      api_key: req.body.api_key,
+      refresh: req.body.refresh
+    })
+    newWidget.save(function (err) {
+      if (err) {
+        return res.json(err)
+      }
+      saveWidgetID(token, newWidget, res)
+    })
+  } else {
+    return res.status(403).send({success: false, msg: 'Unauthorized.'})
+  }
+})
+
+router.get('/widget/guildwars2/wallet/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const token = getToken(req.headers)
+  if (token) {
+    request({
+      url: ' https://api.guildwars2.com/v2/currencies/' + req.params.id,
+      json: true,
+      timeout: 5000
+    }, function (error, response, body) {
+      if (!error && response.statusCode === 200) {
+        return res.status(200).json(response.body)
+      } else {
+        return res.json({success: false, msg: 'Unknown youtube user'})
+      }
     })
   } else {
     return res.status(403).send({success: false, msg: 'Unauthorized.'})

@@ -13,6 +13,10 @@ const YoutubeChannelSchema = new Schema({
   refresh: {
     type: Number,
     default: 300
+  },
+  position: {
+    type: Number,
+    default: 0
   }
 }, { getters: true })
 
@@ -36,6 +40,10 @@ const YoutubeVideoCommentSchema = new Schema({
   refresh: {
     type: Number,
     default: 300
+  },
+  position: {
+    type: Number,
+    default: 0
   }
 }, { getters: true })
 
@@ -55,6 +63,10 @@ const YoutubeLastVideoSchema = new Schema({
   refresh: {
     type: Number,
     default: 300
+  },
+  position: {
+    type: Number,
+    default: 0
   }
 }, { getters: true })
 
