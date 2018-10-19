@@ -1,64 +1,72 @@
 <template>
-  <div class="col-xs-12 col-md-6 col-lg-4">
+  <div class="col-xs-12 col-md-6 col-lg-4" v-if="!isDeleted">
     <q-modal v-model="edit">
-    <q-modal-layout>
-      <q-toolbar slot="header" color="dark">
-        <q-toolbar-title>
-          Edit widget
-        </q-toolbar-title>
-      </q-toolbar>
-      <div class="layout-padding">
-        <div v-for="(info, index) in infos" :key="index">
-          <div v-if="index !== '_id' && index !== 'type'">
-            <q-input v-model="infos[index]" :float-label="index" :type="paramType(infos[index])"></q-input>
+      <q-modal-layout>
+        <q-toolbar color="dark" slot="header">
+          <q-toolbar-title>
+            Edit widget
+          </q-toolbar-title>
+        </q-toolbar>
+        <div class="layout-padding">
+          <div :key="index" v-for="(info, index) in infos">
+            <div v-if="index !== '_id' && index !== 'type'">
+              <q-input :float-label="index" :type="paramType(infos[index])" v-model="infos[index]"></q-input>
+            </div>
           </div>
+          <q-btn @click="validateEdit" color="primary">Validate</q-btn>
         </div>
-        <q-btn color="primary" @click="validateEdit">Validate</q-btn>
-      </div>
-    </q-modal-layout>
+      </q-modal-layout>
     </q-modal>
-    <q-card>
-      <q-card-title>
-        {{ weather.city }}
-        <div v-if="$store.state.toggle.edit_mode" style="float: right">
-          <q-btn @click="edit = true" color="primary" icon="fas fa-edit"></q-btn>
-          <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" ></q-btn>
-        </div>
-      </q-card-title>
-      <q-card-separator />
-      <q-card-main style="margin-top: 10px">
-        <div class="row">
-          <div class="col-7">
-            <div class="row">
-              <div class="col-xs-12 col-sm-5"><i :class="'fa-4x wi wi-owm-' + weather.time + '-' + weather.id "></i></div>
-              <div class="col-xs-12 col-sm-7"><h2 style="margin: 10px 0">{{weather.temperature}}°C</h2></div>
+    <transition
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut"
+    >
+      <q-card>
+        <q-card-title>
+          {{ weather.city }}
+          <div style="float: right" v-if="$store.state.toggle.edit_mode">
+            <q-btn @click="edit = true" color="primary" icon="fas fa-edit" size="xs"></q-btn>
+            <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" size="xs"></q-btn>
+            <q-btn @click="loadData" color="warning" icon="fas fa-sync" size="xs"></q-btn>
+          </div>
+        </q-card-title>
+        <q-card-separator/>
+        <q-card-main style="margin-top: 10px">
+          <div class="row">
+            <div class="col-7">
+              <div class="row">
+                <div class="col-xs-12 col-sm-5"><i :class="'fa-4x wi wi-owm-' + weather.time + '-' + weather.id "></i>
+                </div>
+                <div class="col-xs-12 col-sm-7"><h2 style="margin: 10px 0">{{weather.temperature}}°C</h2></div>
+              </div>
+            </div>
+            <div class="col-5">
+              <div class="row">
+                <p>
+                  Humidity : {{weather.humidity}}%
+                </p>
+              </div>
+              <div class="row">
+                <p>
+                  Wind Speed : {{weather.windSpeed}} km/h
+                </p>
+              </div>
+              <div class="row">
+                <p>
+                  Pressure : {{weather.pressure}} hPa
+                </p>
+              </div>
             </div>
           </div>
-          <div class="col-5">
-            <div class="row">
-              <p>
-                Humidity : {{weather.humidity}}%
-              </p>
-            </div>
-            <div class="row">
-              <p>
-                Wind Speed : {{weather.windSpeed}} km/h
-              </p>
-            </div>
-            <div class="row">
-              <p>
-                Pressure : {{weather.pressure}} hPa
-              </p>
-            </div>
+          <div class="row justify-center">
+            <h4 class="capitalize" style="margin: 0;">
+              {{ weather.description}}
+            </h4>
           </div>
-        </div>
-        <div class="row justify-center">
-          <h4 class="capitalize" style="margin: 0;">
-            {{ weather.description}}
-          </h4>
-        </div>
-      </q-card-main>
-    </q-card>
+        </q-card-main>
+      </q-card>
+    </transition>
   </div>
 </template>
 
@@ -74,6 +82,7 @@ import QToolbar from 'quasar-framework/src/components/toolbar/QToolbar'
 import QToolbarTitle from 'quasar-framework/src/components/toolbar/QToolbarTitle'
 import QSearch from 'quasar-framework/src/components/search/QSearch'
 import QInput from 'quasar-framework/src/components/input/QInput'
+
 export default {
   name: 'weather',
   components: {
@@ -87,9 +96,11 @@ export default {
     QCardMain,
     QCardSeparator,
     QCardTitle,
-    QCard},
+    QCard
+  },
   data () {
     return {
+      isDeleted: false,
       edit: false,
       infos: Object,
       data: Object,
@@ -108,10 +119,8 @@ export default {
               message: response.data.msg,
               icon: 'success'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.loadData()
+            this.edit = false
           } else {
             this.$q.notify({
               color: 'negative',
@@ -148,10 +157,7 @@ export default {
               message: response.data.msg,
               icon: 'report_problem'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.isDeleted = true
           })
           .catch(() => {
             this.$q.notify({

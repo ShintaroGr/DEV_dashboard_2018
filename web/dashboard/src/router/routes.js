@@ -5,7 +5,7 @@ const routes = [
     path: '/',
     component: () => import('layouts/Default.vue'),
     children: [
-      { path: '', component: () => import('pages/Index.vue') }
+      {path: '', component: () => import('pages/Index.vue')}
     ],
     beforeEnter: (to, from, next) => {
       if (Cookies.get('token')) {
@@ -19,7 +19,7 @@ const routes = [
     path: '/login',
     component: () => import('layouts/Login.vue'),
     children: [
-      { path: '', component: () => import('pages/Login.vue') }
+      {path: '', component: () => import('pages/Login.vue')}
     ]
   },
   {

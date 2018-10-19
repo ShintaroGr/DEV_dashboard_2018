@@ -1,52 +1,94 @@
 <template>
-  <div class="col-xs-12 col-md-6 col-lg-4">
+  <div class="col-xs-12 col-md-6 col-lg-4" v-if="!isDeleted">
     <q-modal v-model="edit">
       <q-modal-layout>
-        <q-toolbar slot="header" color="dark">
+        <q-toolbar color="dark" slot="header">
           <q-toolbar-title>
             Edit widget
           </q-toolbar-title>
         </q-toolbar>
         <div class="layout-padding">
-          <div v-for="(info, index) in infos" :key="index">
+          <div :key="index" v-for="(info, index) in infos">
             <div v-if="index !== '_id' && index !== 'type'">
-              <q-input v-model="infos[index]" :float-label="index" :type="paramType(infos[index])"></q-input>
+              <q-input :float-label="index" :type="paramType(infos[index])" v-model="infos[index]"></q-input>
             </div>
           </div>
-          <q-btn color="primary" @click="validateEdit">Validate</q-btn>
+          <q-btn @click="validateEdit" color="primary">Validate</q-btn>
         </div>
       </q-modal-layout>
     </q-modal>
-    <q-card>
-      <q-card-title>
-        Guild Wars 2 {{infos.gems_or_coins}} Exchange
-        <div v-if="$store.state.toggle.edit_mode" style="float: right">
-          <q-btn @click="edit = true" color="primary" icon="fas fa-edit"></q-btn>
-          <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" ></q-btn>
-        </div>
-      </q-card-title>
-      <q-card-separator />
-      <q-card-main style="margin-top: 10px">
-        <div class="text-center q-display-1" v-if="infos.gems_or_coins === 'gems'">
-          1
-          <img class="vertical-middle" src="https://render.guildwars2.com/file/086CF7BC17BC0106A4B15F61213EDB68A2A874AB/502064.png">
-          <q-icon name="fas fa-arrow-right" size="32px"></q-icon>
-          {{(data.coins_per_gem - (data.coins_per_gem % 100)) / 100}}
-          <img class="vertical-middle" src="https://render.guildwars2.com/file/E5A2197D78ECE4AE0349C8B3710D033D22DB0DA6/156907.png">
-          {{data.coins_per_gem % 100}}
-          <img class="vertical-middle" src="https://render.guildwars2.com/file/6CF8F96A3299CFC75D5CC90617C3C70331A1EF0E/156902.png">
+    <transition
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut"
+    >
+      <q-card>
+        <q-card-title>
+          Your delivery box in GuildWars2
+          <div style="float: right" v-if="$store.state.toggle.edit_mode">
+            <q-btn @click="edit = true" color="primary" icon="fas fa-edit" size="xs"></q-btn>
+            <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" size="xs"></q-btn>
+            <q-btn @click="loadData" color="warning" icon="fas fa-sync" size="xs"></q-btn>
           </div>
-        <div class="text-center q-display-1" v-if="infos.gems_or_coins === 'coins'">
-          {{(data.coins_per_gem - (data.coins_per_gem % 100)) / 100}}
-          <img class="vertical-middle" src="https://render.guildwars2.com/file/E5A2197D78ECE4AE0349C8B3710D033D22DB0DA6/156907.png">
-          {{data.coins_per_gem % 100}}
-          <img class="vertical-middle" src="https://render.guildwars2.com/file/6CF8F96A3299CFC75D5CC90617C3C70331A1EF0E/156902.png">
-          <q-icon name="fas fa-arrow-right" size="32px"></q-icon>
-          1
-          <img class="vertical-middle" src="https://render.guildwars2.com/file/086CF7BC17BC0106A4B15F61213EDB68A2A874AB/502064.png">
-        </div>
-      </q-card-main>
-    </q-card>
+        </q-card-title>
+        <q-card-separator/>
+        <q-card-main style="margin-top: 10px">
+          <q-scroll-area style="height: 250px">
+            <div class="row">
+              <div :key="item.id" style="margin: 7px 7px" v-for="item in data.items"
+                   v-if="itemsInfos[item.id] && itemsInfos[item.id].prices">
+                <q-tooltip>
+                  {{itemsInfos[item.id].name}}
+                </q-tooltip>
+                <div style="width: 64px; height: 84px;">
+                  <img :src="itemsInfos[item.id].icon" alt="item icon" height="64px">
+                  <div class="text-center bg-dark text-white"
+                       style="margin-top: -5px; font-size: 16px; padding-top: 2px">
+                    {{Math.ceil(itemsInfos[item.id].prices.sells.unit_price / 10000) * item.count }}
+                    <img alt="gold"
+                         class="vertical-middle"
+                         height="24px" src="https://render.guildwars2.com/file/090A980A96D39FD36FBB004903644C6DBEFB1FFB/156904.png">
+                  </div>
+                  <q-chip color="dark" style="position: relative; top: -100px; right: -45px">
+                    {{item.count}}
+                  </q-chip>
+                </div>
+              </div>
+            </div>
+          </q-scroll-area>
+        </q-card-main>
+        <q-card-separator/>
+        <q-card-actions align="center">
+          <q-btn flat>
+            <q-tooltip>
+              Money to collect
+            </q-tooltip>
+            {{Math.floor((data.coins) / 10000)}}
+            <img alt="gold"
+                 class="vertical-middle"
+                 height="24px" src="https://render.guildwars2.com/file/090A980A96D39FD36FBB004903644C6DBEFB1FFB/156904.png">
+          </q-btn>
+          <q-btn flat>
+            <q-tooltip>
+              Items value
+            </q-tooltip>
+            {{Math.floor((coins - data.coins) / 10000)}}
+            <img alt="gold"
+                 class="vertical-middle"
+                 height="24px" src="https://render.guildwars2.com/file/090A980A96D39FD36FBB004903644C6DBEFB1FFB/156904.png">
+          </q-btn>
+          <q-btn flat>
+            <q-tooltip>
+              Total money
+            </q-tooltip>
+            {{Math.floor(coins / 10000)}}
+            <img alt="gold"
+                 class="vertical-middle"
+                 height="24px" src="https://render.guildwars2.com/file/090A980A96D39FD36FBB004903644C6DBEFB1FFB/156904.png">
+          </q-btn>
+        </q-card-actions>
+      </q-card>
+    </transition>
   </div>
 </template>
 
@@ -63,9 +105,18 @@ import QToolbar from 'quasar-framework/src/components/toolbar/QToolbar'
 import QToolbarTitle from 'quasar-framework/src/components/toolbar/QToolbarTitle'
 import QInput from 'quasar-framework/src/components/input/QInput'
 import QIcon from 'quasar-framework/src/components/icon/QIcon'
+import QTooltip from 'quasar-framework/src/components/tooltip/QTooltip'
+import QChip from 'quasar-framework/src/components/chip/QChip'
+import QCardActions from 'quasar-framework/src/components/card/QCardActions'
+import QScrollArea from 'quasar-framework/src/components/scroll-area/QScrollArea'
+
 export default {
-  name: 'hogwarts',
+  name: 'guildwarsDelivery',
   components: {
+    QScrollArea,
+    QCardActions,
+    QChip,
+    QTooltip,
     QIcon,
     QInput,
     QToolbarTitle,
@@ -77,14 +128,17 @@ export default {
     QCardMain,
     QCardSeparator,
     QCardTitle,
-    QCard},
+    QCard
+  },
   data () {
     return {
+      isDeleted: false,
       edit: false,
       infos: Object,
       data: Object,
-      hogwarts: {},
-      refreshTimer: 300
+      refreshTimer: 300,
+      itemsInfos: {},
+      coins: 0
     }
   },
   methods: {
@@ -98,10 +152,8 @@ export default {
               message: response.data.msg,
               icon: 'success'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.loadData()
+            this.edit = false
           } else {
             this.$q.notify({
               color: 'negative',
@@ -138,10 +190,7 @@ export default {
               message: response.data.msg,
               icon: 'report_problem'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.isDeleted = true
           })
           .catch(() => {
             this.$q.notify({
@@ -160,7 +209,6 @@ export default {
       this.$axios.get(this.$store.state.server.url + '/widget/' + this.widgetId)
         .then((response) => {
           this.infos = response.data
-          this.hogwarts.city = response.data.city
           this.refreshTimer = response.data.refresh
         })
         .catch(() => {
@@ -178,8 +226,25 @@ export default {
       this.$axios.get(this.$store.state.server.url + '/widget/' + this.widgetId + '/data')
         .then((response) => {
           this.data = response.data
-          console.log(response.data)
-          this.$forceUpdate()
+          this.coins = this.data.coins
+          this.data.items.forEach((item) => {
+            this.$axios.get('http://localhost:8080/widget/guildwars2/delivery/' + item.id)
+              .then((response) => {
+                this.itemsInfos[item.id] = response.data
+                this.$axios.get('http://localhost:8080/widget/guildwars2/delivery/' + item.id + '/prices')
+                  .then((response) => {
+                    this.itemsInfos[item.id].prices = response.data
+                    this.coins += response.data.sells.unit_price * item.count
+                    this.$forceUpdate()
+                  })
+                  .catch((error) => {
+                    console.log(error)
+                  })
+              })
+              .catch((error) => {
+                console.log(error)
+              })
+          })
         })
         .catch(() => {
           this.$q.notify({

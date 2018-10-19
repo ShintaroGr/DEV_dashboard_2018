@@ -1,42 +1,50 @@
 <template>
-  <div class="col-xs-12 col-md-6 col-lg-4">
+  <div class="col-xs-12 col-md-6 col-lg-4" v-if="!isDeleted">
     <q-modal v-model="edit">
       <q-modal-layout>
-        <q-toolbar slot="header" color="dark">
+        <q-toolbar color="dark" slot="header">
           <q-toolbar-title>
             Edit widget
           </q-toolbar-title>
         </q-toolbar>
         <div class="layout-padding">
-          <div v-for="(info, index) in infos" :key="index">
+          <div :key="index" v-for="(info, index) in infos">
             <div v-if="index !== '_id' && index !== 'type'">
-              <q-input v-model="infos[index]" :float-label="index" :type="paramType(infos[index])"></q-input>
+              <q-input :float-label="index" :type="paramType(infos[index])" v-model="infos[index]"></q-input>
             </div>
           </div>
-          <q-btn color="primary" @click="validateEdit">Validate</q-btn>
+          <q-btn @click="validateEdit" color="primary">Validate</q-btn>
         </div>
       </q-modal-layout>
     </q-modal>
-    <q-card>
-      <q-card-title>
-        New York Times : {{infos.keyword}}
-        <div v-if="$store.state.toggle.edit_mode" style="float: right">
-          <q-btn @click="edit = true" color="primary" icon="fas fa-edit"></q-btn>
-          <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" ></q-btn>
-        </div>
-      </q-card-title>
-      <q-card-separator />
-      <q-card-main style="margin-top: 10px">
-        <q-scroll-area style="width: 100%; height: 200px;">
-            <q-collapsible v-for="article in articles" :key="article._id" :group="infos.keyword" :label="article.headline.main">
+    <transition
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut"
+    >
+      <q-card>
+        <q-card-title>
+          New York Times : {{infos.keyword}}
+          <div style="float: right" v-if="$store.state.toggle.edit_mode">
+            <q-btn @click="edit = true" color="primary" icon="fas fa-edit" size="xs"></q-btn>
+            <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" size="xs"></q-btn>
+            <q-btn @click="loadData" color="warning" icon="fas fa-sync" size="xs"></q-btn>
+          </div>
+        </q-card-title>
+        <q-card-separator/>
+        <q-card-main style="margin-top: 10px">
+          <q-scroll-area style="width: 100%; height: 200px;">
+            <q-collapsible :group="infos.keyword" :key="article._id" :label="article.headline.main"
+                           v-for="article in articles">
               <div>
                 {{ article.snippet }}
               </div>
               <q-btn @click="openURL(article.web_url)">Go to article</q-btn>
             </q-collapsible>
-        </q-scroll-area>
-      </q-card-main>
-    </q-card>
+          </q-scroll-area>
+        </q-card-main>
+      </q-card>
+    </transition>
   </div>
 </template>
 
@@ -55,6 +63,7 @@ import QModalLayout from 'quasar-framework/src/components/modal/QModalLayout'
 import QToolbar from 'quasar-framework/src/components/toolbar/QToolbar'
 import QToolbarTitle from 'quasar-framework/src/components/toolbar/QToolbarTitle'
 import QInput from 'quasar-framework/src/components/input/QInput'
+
 export default {
   name: 'news',
   components: {
@@ -70,9 +79,11 @@ export default {
     QCard,
     QScrollArea,
     QCollapsible,
-    QList},
+    QList
+  },
   data () {
     return {
+      isDeleted: false,
       edit: false,
       infos: Object,
       data: Object,
@@ -92,10 +103,8 @@ export default {
               message: response.data.msg,
               icon: 'success'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.loadData()
+            this.edit = false
           } else {
             this.$q.notify({
               color: 'negative',
@@ -132,10 +141,7 @@ export default {
               message: response.data.msg,
               icon: 'report_problem'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.isDeleted = true
           })
           .catch(() => {
             this.$q.notify({

@@ -63,13 +63,14 @@ module.exports = function (ctx) {
       plugins: [
         'Notify',
         'Cookies',
-        'Dialog'
+        'Dialog',
+        'Screen'
       ]
       // iconSet: ctx.theme.mat ? 'material-icons' : 'ionicons'
       // i18n: 'de' // Quasar language
     },
     // animations: 'all' --- includes all animations
-    animations: [],
+    animations: 'all',
     ssr: {
       pwa: false
     },

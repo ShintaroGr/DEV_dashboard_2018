@@ -1,39 +1,46 @@
 <template>
-  <div class="col-xs-12 col-md-6 col-lg-4">
+  <div class="col-xs-12 col-md-6 col-lg-4" v-if="!isDeleted">
     <q-modal v-model="edit">
       <q-modal-layout>
-        <q-toolbar slot="header" color="dark">
+        <q-toolbar color="dark" slot="header">
           <q-toolbar-title>
             Edit widget
           </q-toolbar-title>
         </q-toolbar>
         <div class="layout-padding">
-          <div v-for="(info, index) in infos" :key="index">
+          <div :key="index" v-for="(info, index) in infos">
             <div v-if="index !== '_id' && index !== 'type'">
-              <q-input v-model="infos[index]" :float-label="index" :type="paramType(infos[index])"></q-input>
+              <q-input :float-label="index" :type="paramType(infos[index])" v-model="infos[index]"></q-input>
             </div>
           </div>
-          <q-btn color="primary" @click="validateEdit">Validate</q-btn>
+          <q-btn @click="validateEdit" color="primary">Validate</q-btn>
         </div>
       </q-modal-layout>
     </q-modal>
-    <q-card>
-      <q-card-title>
-       Reddit /r/{{ infos.subreddit }}
-        <div v-if="$store.state.toggle.edit_mode" style="float: right">
-          <q-btn @click="edit = true" color="primary" icon="fas fa-edit"></q-btn>
-          <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" ></q-btn>
-        </div>
-      </q-card-title>
-      <q-card-separator />
-      <q-card-main style="margin-top: 10px">
-        <q-scroll-area style="width: 100%; height: 200px;">
-          <div style="padding: 5px;" v-for="(n, index) in posts" :key="index">
-            <q-btn style="width: 100%" @click="openURL(n.data.url)" class="large"> {{ n.data.title}}</q-btn>
+    <transition
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut"
+    >
+      <q-card>
+        <q-card-title>
+          Reddit /r/{{ infos.subreddit }}
+          <div style="float: right" v-if="$store.state.toggle.edit_mode">
+            <q-btn @click="edit = true" color="primary" icon="fas fa-edit" size="xs"></q-btn>
+            <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" size="xs"></q-btn>
+            <q-btn @click="loadData" color="warning" icon="fas fa-sync" size="xs"></q-btn>
           </div>
-        </q-scroll-area>
-      </q-card-main>
-    </q-card>
+        </q-card-title>
+        <q-card-separator/>
+        <q-card-main style="margin-top: 10px">
+          <q-scroll-area style="width: 100%; height: 200px;">
+            <div :key="index" style="padding: 5px;" v-for="(n, index) in posts">
+              <q-btn @click="openURL(n.data.url)" class="large" style="width: 100%"> {{ n.data.title}}</q-btn>
+            </div>
+          </q-scroll-area>
+        </q-card-main>
+      </q-card>
+    </transition>
   </div>
 </template>
 
@@ -52,6 +59,7 @@ import QModalLayout from 'quasar-framework/src/components/modal/QModalLayout'
 import QToolbar from 'quasar-framework/src/components/toolbar/QToolbar'
 import QToolbarTitle from 'quasar-framework/src/components/toolbar/QToolbarTitle'
 import QInput from 'quasar-framework/src/components/input/QInput'
+
 export default {
   name: 'reddit',
   components: {
@@ -67,9 +75,11 @@ export default {
     QCard,
     QScrollArea,
     QCollapsible,
-    QList},
+    QList
+  },
   data () {
     return {
+      isDeleted: false,
       edit: false,
       infos: Object,
       data: Object,
@@ -89,10 +99,8 @@ export default {
               message: response.data.msg,
               icon: 'success'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.loadData()
+            this.edit = false
           } else {
             this.$q.notify({
               color: 'negative',
@@ -129,10 +137,7 @@ export default {
               message: response.data.msg,
               icon: 'report_problem'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.isDeleted = true
           })
           .catch(() => {
             this.$q.notify({
@@ -171,8 +176,7 @@ export default {
           this.posts = response.data.data.children
           this.$forceUpdate()
         })
-        .catch((error) => {
-          console.log(error)
+        .catch(() => {
           this.$q.notify({
             color: 'negative',
             position: 'top',

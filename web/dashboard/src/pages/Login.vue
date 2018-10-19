@@ -3,14 +3,14 @@
     <q-card-title>
       Login
     </q-card-title>
-    <q-card-separator />
+    <q-card-separator/>
     <q-card-main>
-      <q-input v-model="username" float-label="Username" />
-      <q-input v-model="password" float-label="Password" type="password"/>
+      <q-input float-label="Username" v-model="username"/>
+      <q-input float-label="Password" type="password" v-model="password"/>
       <div class="row q-mt-md">
         <div class="col-12">
-          <q-btn @click="switchForm" >Register</q-btn>
-          <q-btn @click="login" style="float: right" color="primary">Login</q-btn>
+          <q-btn @click="switchForm">Register</q-btn>
+          <q-btn @click="login" color="primary" style="float: right">Login</q-btn>
         </div>
       </div>
     </q-card-main>
@@ -19,16 +19,16 @@
     <q-card-title>
       Register
     </q-card-title>
-    <q-card-separator />
+    <q-card-separator/>
     <q-card-main>
-      <q-input v-model="name" float-label="Full Name" />
-      <q-input v-model="email" float-label="Email" type="email"/>
-      <q-input v-model="username" float-label="Username" />
-      <q-input v-model="password" float-label="Password" type="password"/>
+      <q-input float-label="Full Name" v-model="name"/>
+      <q-input float-label="Email" type="email" v-model="email"/>
+      <q-input float-label="Username" v-model="username"/>
+      <q-input float-label="Password" type="password" v-model="password"/>
       <div class="row q-mt-xl">
         <div class="col-12">
           <q-btn @click="switchForm">Login</q-btn>
-          <q-btn @click="register" style="float: right" color="primary" >Register</q-btn>
+          <q-btn @click="register" color="primary" style="float: right">Register</q-btn>
         </div>
       </div>
     </q-card-main>
@@ -61,7 +61,8 @@ export default {
     QBtn,
     QModalLayout,
     QModal,
-    QSelect },
+    QSelect
+  },
   data () {
     return {
       registerForm: false,
@@ -74,7 +75,7 @@ export default {
   mounted () {
     if (this.$q.cookies.get('token')) {
       this.$store.state.user.token = this.$q.cookies.get('token')
-      this.$router.push({ path: `/` })
+      this.$router.push({path: `/`})
     }
   },
   methods: {
@@ -90,7 +91,7 @@ export default {
         this.$axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
         this.$q.cookies.set('token', response.data.token)
         this.$store.state.user.token = response.data.token
-        this.$router.push({ path: `/` })
+        this.$router.push({path: `/`})
       })
         .catch((error) => {
           console.warn(error)
@@ -137,7 +138,6 @@ export default {
         })
     }
   },
-  computed: {
-  }
+  computed: {}
 }
 </script>

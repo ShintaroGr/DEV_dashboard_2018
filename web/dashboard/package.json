@@ -2,7 +2,7 @@
   "name": "dashboard",
   "version": "1.0.0",
   "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "productName": "Dashboard",
   "cordovaId": "org.cordova.quasar.app",
   "author": "Thomas GRANDJEAN <thomas.grandjean@epitech.eu>",
   "private": true,
@@ -13,6 +13,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "quasar-framework": "^0.17.16",
+    "vuedraggable": "^2.16.0",
     "vuelidate": "^0.7.4"
   },
   "devDependencies": {

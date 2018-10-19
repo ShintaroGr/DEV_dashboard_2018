@@ -1,29 +1,42 @@
 <template>
-  <div class="col-xs-12 col-md-6 col-lg-4" v-if="data.items">
+  <div class="col-xs-12 col-md-6 col-lg-4" v-if="data.items && !isDeleted">
     <q-modal v-model="edit">
       <q-modal-layout>
-        <q-toolbar slot="header" color="dark">
+        <q-toolbar color="dark" slot="header">
           <q-toolbar-title>
             Edit widget
           </q-toolbar-title>
         </q-toolbar>
         <div class="layout-padding">
-          <div v-for="(info, index) in infos" :key="index">
+          <div :key="index" v-for="(info, index) in infos">
             <div v-if="index !== '_id' && index !== 'type'">
-              <q-input v-model="infos[index]" :float-label="index" :type="paramType(infos[index])"></q-input>
+              <q-input :float-label="index" :type="paramType(infos[index])" v-model="infos[index]"></q-input>
             </div>
           </div>
-          <q-btn color="primary" @click="validateEdit">Validate</q-btn>
+          <q-btn @click="validateEdit" color="primary">Validate</q-btn>
         </div>
       </q-modal-layout>
     </q-modal>
-    <q-card>
-      <q-card-main>
-        <iframe width="100%" height="315"
-                :src="'https://www.youtube.com/embed/' + data.items[0].id.videoId" >
-        </iframe>
-      </q-card-main>
-    </q-card>
+    <transition
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut"
+    >
+      <q-card>
+        <q-card-title v-if="$store.state.toggle.edit_mode">
+          <div style="float: right">
+            <q-btn @click="edit = true" color="primary" icon="fas fa-edit" size="xs"></q-btn>
+            <q-btn @click="deleteWidget" color="negative" icon="fas fa-trash" size="xs"></q-btn>
+            <q-btn @click="loadData" color="warning" icon="fas fa-sync" size="xs"></q-btn>
+          </div>
+        </q-card-title>
+        <q-card-main>
+          <iframe :src="'https://www.youtube.com/embed/' + data.items[0].id.videoId" height="315"
+                  width="100%">
+          </iframe>
+        </q-card-main>
+      </q-card>
+    </transition>
   </div>
 </template>
 
@@ -64,6 +77,7 @@ export default {
   },
   data () {
     return {
+      isDeleted: false,
       edit: false,
       infos: Object,
       data: Object,
@@ -83,10 +97,8 @@ export default {
               message: response.data.msg,
               icon: 'success'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.loadData()
+            this.edit = false
           } else {
             this.$q.notify({
               color: 'negative',
@@ -123,10 +135,7 @@ export default {
               message: response.data.msg,
               icon: 'report_problem'
             })
-            this.$router.go({
-              path: '/',
-              force: true
-            })
+            this.isDeleted = true
           })
           .catch(() => {
             this.$q.notify({
@@ -162,11 +171,9 @@ export default {
       this.$axios.get(this.$store.state.server.url + '/widget/' + this.widgetId + '/data')
         .then((response) => {
           this.data = response.data
-          console.log(this.data)
           this.$forceUpdate()
         })
-        .catch((error) => {
-          console.log(error)
+        .catch(() => {
           this.$q.notify({
             color: 'negative',
             position: 'top',

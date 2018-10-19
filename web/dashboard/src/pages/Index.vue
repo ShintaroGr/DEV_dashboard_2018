@@ -1,31 +1,36 @@
 <template>
   <div>
-  <q-modal v-model="add_widget" :content-css="{minWidth: '80vw', minHeight: '80vh'}">
-    <q-modal-layout>
-      <q-toolbar slot="header" color="dark">
-        <q-toolbar-title>
-          Add widget
-        </q-toolbar-title>
-      </q-toolbar>
-      <div class="layout-padding">
-        <q-select
-          v-model="select"
-          :options="selectOptions"
-          @input="onSelection"
-          float-label="Choose a widget type"
-        />
-        <div>
-          <q-input v-for="params in widgetParams" :key="params.name" v-model="text[params.value]" :float-label="params.name" :type="paramType(params.type)"></q-input>
+    <q-modal :content-css="{minWidth: '80vw', minHeight: '80vh'}" v-model="add_widget">
+      <q-modal-layout>
+        <q-toolbar color="dark" slot="header">
+          <q-toolbar-title>
+            Add widget
+          </q-toolbar-title>
+        </q-toolbar>
+        <div class="layout-padding">
+          <q-select
+            :options="selectOptions"
+            @input="onSelection"
+            float-label="Choose a widget type"
+            v-model="select"
+          />
+          <div>
+            <q-input :float-label="params.name" :key="params.name" :type="paramType(params.type)"
+                     v-for="params in widgetParams" v-model="text[params.value]"></q-input>
+          </div>
+          <div class="row q-mt-md">
+            <q-btn @click="validWidget" icon="fas fa-check" v-if="widgetParams"><span style="margin-left: 10px"></span>Create
+              widget
+            </q-btn>
+          </div>
         </div>
-        <div class="row q-mt-md">
-          <q-btn v-if="widgetParams" @click="validWidget" icon="fas fa-check"><span style="margin-left: 10px"></span>Create widget</q-btn>
-        </div>
-      </div>
-    </q-modal-layout>
-  </q-modal>
-    <div class="row masonry">
-        <div v-for="widget in widgets" :key="widget._id" :is="widget.type" :widgetId="widget._id"></div>
-    </div>
+      </q-modal-layout>
+    </q-modal>
+    <draggable :list="widgets" :style="mansonry_size" @end="drag=false" @start="drag=true" @update="checkMove" class="row"
+               v-if="widgets">
+      <div :id="widget._id" :is="widget.type" :key="widget._id" :widgetId="widget._id" ref="refWidget"
+           v-for="widget in widgets"></div>
+    </draggable>
   </div>
 </template>
 
@@ -43,23 +48,36 @@ import Hogwarts from '../components/hogwarts'
 import Reddit from '../components/reddit'
 import YoutubeChannel from '../components/youtubeChannel'
 import YoutubeLastVideo from '../components/youtubeLastVideo'
+import Movie from '../components/movies'
+import GuildWarsGems from '../components/guildwarsGems'
+import GuildWarsDelivery from '../components/guildwarsDelivery'
+import { Screen } from 'quasar'
+import draggable from 'vuedraggable'
+import GuildWarsWallet from '../components/guildwarsWallet'
 
 export default {
   name: 'PageIndex',
   components: {
+    GuildWarsWallet,
+    Screen,
     YoutubeLastVideo,
     YoutubeChannel,
     Reddit,
     Hogwarts,
     News,
     Weather,
+    GuildWarsGems,
+    Movie,
+    GuildWarsDelivery,
     QInput,
     QToolbarTitle,
     QToolbar,
     QBtn,
     QModalLayout,
     QModal,
-    QSelect},
+    QSelect,
+    draggable
+  },
   data () {
     return {
       select: '',
@@ -69,10 +87,12 @@ export default {
       widgetParams: '',
       widgetUrl: '',
       text: {},
-      widgets: ''
+      widgets: '',
+      height: 0
     }
   },
   mounted () {
+    this.$q.screen.setDebounce(5)
     this.$axios.defaults.headers.common['Authorization'] = this.$q.cookies.get('token')
     this.$axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
     this.$axios.get(this.$store.state.server.url + '/about.json')
@@ -93,7 +113,7 @@ export default {
         })
       })
 
-    this.$axios.get(this.$store.state.server.url + '/widget', { headers: { Authorization: this.$q.cookies.get('token') } })
+    this.$axios.get(this.$store.state.server.url + '/widget', {headers: {Authorization: this.$q.cookies.get('token')}})
       .then((response) => {
         this.widgets = response.data
       })
@@ -107,6 +127,26 @@ export default {
       })
   },
   methods: {
+    checkMove (evt) {
+      this.$emit('updated', this.widgets)
+      this.widgets.map((widget, index) => {
+        widget.position = index
+        return widget
+      })
+      for (let widget of this.widgets) {
+        this.$axios.put(this.$store.state.server.url + '/widget/' + widget._id, widget)
+          .then((response) => {
+          })
+          .catch(() => {
+            this.$q.notify({
+              color: 'negative',
+              position: 'top',
+              message: 'Loading failed',
+              icon: 'report_problem'
+            })
+          })
+      }
+    },
     onSelection (val) {
       this.widgetParams = this.services.find(service => service.name === val.split('.')[0]).widgets.find(widget => widget.name === val.split('.')[1]).params
       this.widgetUrl = this.services.find(service => service.name === val.split('.')[0]).widgets.find(widget => widget.name === val.split('.')[1]).url
@@ -126,6 +166,7 @@ export default {
               force: true
             })
           } else {
+            console.log(response)
             this.$q.notify({
               color: 'negative',
               position: 'top',
@@ -134,7 +175,8 @@ export default {
             })
           }
         })
-        .catch(() => {
+        .catch((response) => {
+          console.log(response)
           this.$q.notify({
             color: 'negative',
             position: 'top',
@@ -148,6 +190,28 @@ export default {
     }
   },
   computed: {
+    mansonry_size () {
+      let style = {
+        'display': 'flex',
+        'flex-flow': 'column wrap',
+        height: '400px'
+      }
+      if (this.$q.screen.lt.sm || this.$q.screen.sm) {
+        style.height = ((this.widgets.length * 350)) + 'px'
+      } else if (this.$q.screen.lt.md || this.$q.screen.md) {
+        style.height = ((this.widgets.length * 350) / 2) + 'px'
+      } else if (this.$q.screen.lt.lg || this.$q.screen.lg) {
+        style.height = ((this.widgets.length * 350) / 3) + 'px'
+      } else if (this.$q.screen.lt.xl || this.$q.screen.xl) {
+        style.height = ((this.widgets.length * 350) / 3) + 'px'
+      } else {
+        style.height = ((this.widgets.length * 350) / 3) + 'px'
+      }
+      if (this.$store.state.toggle.edit_mode) {
+        style.height = style.height.split('.')[0] * 1.05 + 'px'
+      }
+      return style
+    },
     add_widget: {
       get () {
         return this.$store.state.toggle.add_widget
@@ -166,13 +230,8 @@ export default {
     }
   }
 }
+
 </script>
 
 <style>
-  .masonry {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    height: 100vw;
-  }
 </style>

@@ -2,17 +2,17 @@
   <q-layout view="lHh Lpr lFf">
     <q-layout-header>
       <q-toolbar
-        color="dark"
         :inverted="$q.theme === 'ios'"
+        color="dark"
       >
         <q-btn
-          flat
-          dense
-          round
           @click="leftDrawerOpen = !leftDrawerOpen"
           aria-label="Menu"
+          dense
+          flat
+          round
         >
-          <q-icon name="menu" />
+          <q-icon name="menu"/>
         </q-btn>
 
         <q-toolbar-title>
@@ -21,11 +21,11 @@
       </q-toolbar>
     </q-layout-header>
 
-    <q-layout-drawer v-model="leftDrawerOpen" :content-class="$q.theme === 'mat' ? 'bg-grey-2' : null">
-      <q-list no-border link inset-delimiter>
-        <q-list no-border link inset-delimiter>
+    <q-layout-drawer :content-class="$q.theme === 'mat' ? 'bg-grey-2' : null" v-model="leftDrawerOpen">
+      <q-list inset-delimiter link no-border>
+        <q-list inset-delimiter link no-border>
           <q-list-header>Navigation</q-list-header>
-          <q-item to="/" exact>
+          <q-item exact to="/">
             <q-item-side icon="fas fa-home"/>
             <q-item-main label="Home"/>
           </q-item>
@@ -42,7 +42,7 @@
     </q-layout-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view/>
     </q-page-container>
   </q-layout>
 </template>
@@ -84,7 +84,7 @@ export default {
   },
   data () {
     return {
-      leftDrawerOpen: !this.$q.platform.is.desktop
+      leftDrawerOpen: false
     }
   },
   methods: {

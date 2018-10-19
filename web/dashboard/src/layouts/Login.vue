@@ -3,7 +3,7 @@
     <div class="row" style="height: 100vh">
       <div class="col-5 self-center" style="margin: 0 auto">
         <q-page-container>
-          <router-view />
+          <router-view/>
         </q-page-container>
 
       </div>
