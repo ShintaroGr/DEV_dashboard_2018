@@ -1,0 +1,15 @@
+define({
+  "name": "Dashboard",
+  "version": "0.1.0",
+  "description": "Dashboard api for the project Dashboard from Epitech",
+  "title": "Dashboard 2018",
+  "sampleUrl": false,
+  "defaultVersion": "0.0.0",
+  "apidoc": "0.3.0",
+  "generator": {
+    "name": "apidoc",
+    "time": "2018-10-19T17:03:42.030Z",
+    "url": "http://apidocjs.com",
+    "version": "0.17.6"
+  }
+});

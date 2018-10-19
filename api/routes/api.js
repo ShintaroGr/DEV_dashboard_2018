@@ -46,14 +46,37 @@ function saveWidgetID (token, newWidget, res) {
   })
 }
 
-// A route that gives you all the widgets of the dashboard
+/**
+ * @api {get} /about.json Request information about the server
+ * @apiName Dashboard
+ * @apiGroup Server
+ *
+ *
+ * @apiSuccess {Object} server Information about the server
+ * @apiSuccess {Object} client Information about the client
+ */
 router.get('/about.json', (req, res) => {
   aboutJson.client.host = req.connection.remoteAddress.split(':')[2] === '1' ? '127.0.0.1' : req.socket.remoteAddress.split(':')[3]
   aboutJson.server.current_time = Date.now()
   res.json(aboutJson)
 })
 
-// A route used to create a user
+/**
+ * @api {post} /signup Create a new user
+ * @apiName Signup
+ * @apiGroup User
+ *
+ * @apiParam {String} username Username of the User.
+ * @apiParam {String} password Password of the User.
+ * @apiParam {String} name Name of the User.
+ * @apiParam {String} email Email of the User.
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/signup', (req, res) => {
   if (!req.body.username || !req.body.password) {
     res.json({success: false, msg: 'Please pass username and password.'})
@@ -75,12 +98,25 @@ router.post('/signup', (req, res) => {
   }
 })
 
-// A route to log in an account
+/**
+ * @api {post} /signin Login to a user
+ * @apiName Signin
+ * @apiGroup User
+ *
+ * @apiParam {String} username Username of the User.
+ * @apiParam {String} password Password of the User.
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} token A token specific to the user
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/signin', (req, res) => {
   User.findOne({
     username: req.body.username
   }, function (err, user) {
-    if (err) throw err
+    if (err) res.status(500).send({success: false, msg: 'Something went wrong.'})
     if (!user) {
       res.status(401).send({success: false, msg: 'Authentication failed. User not found.'})
     } else {
@@ -98,7 +134,16 @@ router.post('/signin', (req, res) => {
   })
 })
 
-// A route that give all your widgets
+/**
+ * @api {get} /widget List all of the user's widget
+ * @apiName Get all
+ * @apiGroup Widget
+ *
+ * @apiSuccess {Object} data An array of all your widget
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.get('/widget', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -107,7 +152,7 @@ router.get('/widget', passport.authenticate('jwt', {session: false}), (req, res)
     })
       .populate({path: 'item', select: '-__v'})
       .exec(function (err, widget) {
-        if (err) throw err
+        if (err) res.status(500).send({success: false, msg: 'Something went wrong.'})
         if (!widget) {
           res.status(500).send({success: false, msg: 'Widget not found.'})
         } else {
@@ -124,14 +169,25 @@ router.get('/widget', passport.authenticate('jwt', {session: false}), (req, res)
   }
 })
 
-// A route that give all the widget with the id
+/**
+ * @api {get} /widget/:id Get the widget with the id :id
+ * @apiName Get by id
+ * @apiGroup Widget
+ *
+ * @apiParam {String} id The id of a widget
+ *
+ * @apiSuccess {Object} widget The widget with the id
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.get('/widget/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
     Widget.findOne({item: req.params.id})
       .populate({path: 'item', select: '-__v'})
       .exec(function (err, widget) {
-        if (err) throw err
+        if (err) res.status(500).send({success: false, msg: 'Something went wrong.'})
         if (widget) {
           res.json(widget.item)
         } else {
@@ -143,18 +199,30 @@ router.get('/widget/:id', passport.authenticate('jwt', {session: false}), (req, 
   }
 })
 
-// A route that delete the widget with the id
+/**
+ * @api {delete} /widget/:id Delete the widget with the id :id
+ * @apiName Delete by id
+ * @apiGroup Widget
+ *
+ * @apiParam {String} id The id of a widget
+ *
+ * @apiError {Boolean} success True if the request is valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.delete('/widget/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
     Widget.findOne({item: req.params.id})
       .exec((err, widget) => {
-        if (err) throw err
+        if (err) res.status(500).send({success: false, msg: 'Something went wrong.'})
         mongoose.model(widget.onModel)
           .findOne({_id: widget.item._id})
           .remove()
           .exec((err, object) => {
-            if (err) throw err
+            if (err) res.status(500).send({success: false, msg: 'Something went wrong.'})
           })
         widget.remove()
         res.status(200).json({success: true, msg: 'Widget has been deleted.'})
@@ -164,19 +232,32 @@ router.delete('/widget/:id', passport.authenticate('jwt', {session: false}), (re
   }
 })
 
-// A route that modify the widget with the id
+/**
+ * @api {put} /widget/:id Edit the widget with the id :id
+ * @apiName Edit by id
+ * @apiGroup Widget
+ *
+ * @apiParam {String} id The id of a widget
+ * @apiParam {Object} body The new body of the widget
+ *
+ * @apiError {Boolean} success True if the request is valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.put('/widget/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
     Widget.findOne({item: req.params.id})
       .exec((err, widget) => {
-        if (err) throw err
+        if (err) res.status(500).send({success: false, msg: 'Something went wrong.'})
         mongoose.model(widget.onModel).findByIdAndUpdate(
           req.params.id,
           req.body,
           {new: true},
           (err, item) => {
-            if (err) return res.status(500).send(err)
+            if (err) res.status(500).send({success: false, msg: 'Something went wrong.'})
             return res.json(item)
           }
         )
@@ -186,16 +267,26 @@ router.put('/widget/:id', passport.authenticate('jwt', {session: false}), (req, 
   }
 })
 
-// A route that get the data from the api_url set in the model
+/**
+ * @api {get} /widget/:id/data Edit the widget with the id :id
+ * @apiName Data
+ * @apiGroup Widget
+ *
+ * @apiParam {String} id The id of a widget
+ *
+ * @apiSuccess {Object} body The data from the api_url of the models
+ *
+ * @apiError {Object} body The data from the api_url of the models
+ */
 router.get('/widget/:id/data', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
     Widget.findOne({item: req.params.id})
       .populate({path: 'item', select: '-__v'})
       .exec(function (err, widget) {
-        if (err) throw err
+        if (err) res.status(500).send({success: false, msg: 'Something went wrong.'})
         if (!widget) {
-          return res.status(200)
+          res.status(500).send({success: false, msg: 'Something went wrong.'})
         }
         request({
           url: widget.item.api_url,
@@ -214,7 +305,20 @@ router.get('/widget/:id/data', passport.authenticate('jwt', {session: false}), (
   }
 })
 
-// The route that manages the creation of the youtubeChannel widget
+/**
+ * @api {post} /widget/youtube/channel Create a new youtube channel widget
+ * @apiName YoutubeChannel
+ * @apiGroup Widget
+ *
+ * @apiParam {String} youtube_name Name of a youtube channel
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/youtube/channel', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -245,7 +349,20 @@ router.post('/widget/youtube/channel', passport.authenticate('jwt', {session: fa
   }
 })
 
-// The route that manages the creation of the youtubeVideo widget
+/**
+ * @api {post} /widget/youtube/video Create a new youtube video widget
+ * @apiName YoutubeVideo
+ * @apiGroup Widget
+ *
+ * @apiParam {String} youtube_name Name of a youtube channel
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/youtube/video', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -276,7 +393,20 @@ router.post('/widget/youtube/video', passport.authenticate('jwt', {session: fals
   }
 })
 
-// The route that manages the creation of the NYT widget
+/**
+ * @api {post} /widget/news Create a new News widget
+ * @apiName News
+ * @apiGroup Widget
+ *
+ * @apiParam {String} keyword Keyword of the articles wanted
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/news', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -296,7 +426,20 @@ router.post('/widget/news', passport.authenticate('jwt', {session: false}), (req
   }
 })
 
-// The route that manages the creation of the Weather widget
+/**
+ * @api {post} /widget/weather Create a new Weather widget
+ * @apiName Weather
+ * @apiGroup Widget
+ *
+ * @apiParam {String} city where to take weather informations
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/weather', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -315,7 +458,20 @@ router.post('/widget/weather', passport.authenticate('jwt', {session: false}), (
   }
 })
 
-// The route that manages the creation of the Reddit widget
+/**
+ * @api {post} /widget/reddit Create a new Reddit widget
+ * @apiName Reddit
+ * @apiGroup Widget
+ *
+ * @apiParam {String} subreddit Which subreddit to retrieve data from
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/reddit', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -336,7 +492,20 @@ router.post('/widget/reddit', passport.authenticate('jwt', {session: false}), (r
   }
 })
 
-// The route that manages the creation of the Hogwarts widget
+/**
+ * @api {post} /widget/hogwarts Create a new Hogwarts widget
+ * @apiName Hogwarts
+ * @apiGroup Widget
+ *
+ * @apiParam {String} city From where you want the point to be retrieved
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/hogwarts', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -355,7 +524,20 @@ router.post('/widget/hogwarts', passport.authenticate('jwt', {session: false}), 
   }
 })
 
-// The route that manages the creation of the Movies widget
+/**
+ * @api {post} /widget/news Create a new Movies widget
+ * @apiName Movies
+ * @apiGroup Widget
+ *
+ * @apiParam {String} sort now_playing or upcomming
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/movies', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -374,7 +556,20 @@ router.post('/widget/movies', passport.authenticate('jwt', {session: false}), (r
   }
 })
 
-// The route that manages the creation of the Gw2Gems widget
+/**
+ * @api {post} /widget/guildwars2/gems Create a new Gw2Gems widget
+ * @apiName Gw2Gems
+ * @apiGroup Widget
+ *
+ * @apiParam {String} gems_or_coins Which way the exchange is taken
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/guildwars2/gems', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -393,7 +588,20 @@ router.post('/widget/guildwars2/gems', passport.authenticate('jwt', {session: fa
   }
 })
 
-// The route that manages the creation of the GW2Delivery widget
+/**
+ * @api {post} /widget/guildwars2/delivery Create a new Gw2Delivery widget
+ * @apiName Gw2Delivery
+ * @apiGroup Widget
+ *
+ * @apiParam {String} api_key Api Key from where to get informations
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/guildwars2/delivery', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -412,7 +620,17 @@ router.post('/widget/guildwars2/delivery', passport.authenticate('jwt', {session
   }
 })
 
-// The route that manages the retrieving of the GW2Delivery item by id
+/**
+ * @api {post} /widget/guildwars2/delivery/:id Get data from an guildwars2 item
+ * @apiName Gw2Item
+ * @apiGroup Data
+ *
+ * @apiParam {String} id Id of the item
+ *
+ * @apiSuccess {Object} item Item informations
+ *
+ * @apiError {Object} item Item informations
+ */
 router.get('/widget/guildwars2/delivery/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -432,7 +650,17 @@ router.get('/widget/guildwars2/delivery/:id', passport.authenticate('jwt', {sess
   }
 })
 
-// The route that manages the retrieving of the GW2Delivery item prices by id
+/**
+ * @api {post} /widget/guildwars2/delivery/:id/prices Get the price of an guildwars2 item
+ * @apiName Gw2Prices
+ * @apiGroup Data
+ *
+ * @apiParam {String} id Id of the item
+ *
+ * @apiSuccess {Object} item Item prices
+ *
+ * @apiError {Object} item Item prices
+ */
 router.get('/widget/guildwars2/delivery/:id/prices', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -452,7 +680,20 @@ router.get('/widget/guildwars2/delivery/:id/prices', passport.authenticate('jwt'
   }
 })
 
-// The route that manages the creation of the GW2Wallet widget
+/**
+ * @api {post} /widget/guildwars2/wallet Create a new Gw2Wallet widget
+ * @apiName Gw2Wallet
+ * @apiGroup Widget
+ *
+ * @apiParam {String} api_key Api Key from where to get informations
+ * @apiParam {Number} refresh Refresh timer in seconds
+ *
+ * @apiSuccess {Boolean} success True if the request is valid and saved
+ * @apiSuccess {String} msg Message that describe handling of the request
+ *
+ * @apiError {Boolean} success False if the request isn't valid and saved
+ * @apiError {String} msg Message that describe handling of the request
+ */
 router.post('/widget/guildwars2/wallet', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -471,7 +712,17 @@ router.post('/widget/guildwars2/wallet', passport.authenticate('jwt', {session: 
   }
 })
 
-// The route that manages the retrieving of the GW2Wallet currencies informations
+/**
+ * @api {post} /widget/guildwars2/wallet/:id Get data from an guildwars2 currency
+ * @apiName Gw2Item
+ * @apiGroup Data
+ *
+ * @apiParam {String} id Id of the currency
+ *
+ * @apiSuccess {Object} currency Currency informations
+ *
+ * @apiError {Object} currency Currency informations
+ */
 router.get('/widget/guildwars2/wallet/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
