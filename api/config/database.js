@@ -1,4 +1,4 @@
 module.exports = {
   'secret': 'nodeauthsecret',
-  'database': 'mongodb://localhost:27017/Dashboard'
+  'database': 'mongodb://mongodb:27017/Dashboard'
 }

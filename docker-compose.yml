@@ -21,3 +21,10 @@ services:
     image: mongo
     ports:
       - "27017:27017"
+  doc:
+    container_name: doc
+    image: linuxserver/nginx
+    ports:
+      - "80:80"
+    volumes:
+       - ./docs:/config

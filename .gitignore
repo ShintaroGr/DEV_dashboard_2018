@@ -1,6 +1,12 @@
 
 # Created by https://www.gitignore.io/api/node,webstorm+all
 
+### Personnal ###
+
+docs/keys
+docs/nginx
+docs/php
+
 ### Node ###
 # Logs
 logs
