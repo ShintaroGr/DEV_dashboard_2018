@@ -46,12 +46,14 @@ function saveWidgetID (token, newWidget, res) {
   })
 }
 
+// A route that gives you all the widgets of the dashboard
 router.get('/about.json', (req, res) => {
   aboutJson.client.host = req.connection.remoteAddress.split(':')[2] === '1' ? '127.0.0.1' : req.socket.remoteAddress.split(':')[3]
   aboutJson.server.current_time = Date.now()
   res.json(aboutJson)
 })
 
+// A route used to create a user
 router.post('/signup', (req, res) => {
   if (!req.body.username || !req.body.password) {
     res.json({success: false, msg: 'Please pass username and password.'})
@@ -73,6 +75,7 @@ router.post('/signup', (req, res) => {
   }
 })
 
+// A route to log in an account
 router.post('/signin', (req, res) => {
   User.findOne({
     username: req.body.username
@@ -95,6 +98,7 @@ router.post('/signin', (req, res) => {
   })
 })
 
+// A route that give all your widgets
 router.get('/widget', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -120,6 +124,7 @@ router.get('/widget', passport.authenticate('jwt', {session: false}), (req, res)
   }
 })
 
+// A route that give all the widget with the id
 router.get('/widget/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -138,6 +143,7 @@ router.get('/widget/:id', passport.authenticate('jwt', {session: false}), (req, 
   }
 })
 
+// A route that delete the widget with the id
 router.delete('/widget/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -158,6 +164,7 @@ router.delete('/widget/:id', passport.authenticate('jwt', {session: false}), (re
   }
 })
 
+// A route that modify the widget with the id
 router.put('/widget/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -179,6 +186,7 @@ router.put('/widget/:id', passport.authenticate('jwt', {session: false}), (req, 
   }
 })
 
+// A route that get the data from the api_url set in the model
 router.get('/widget/:id/data', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -205,7 +213,8 @@ router.get('/widget/:id/data', passport.authenticate('jwt', {session: false}), (
     return res.status(403).send({success: false, msg: 'Unauthorized.'})
   }
 })
-// https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&maxResults=1&q=(Sivhd)&key=AIzaSyCLWyuC1IuQxDfAiwX2nYnn1WWRnqZKTJk
+
+// The route that manages the creation of the youtubeChannel widget
 router.post('/widget/youtube/channel', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -236,25 +245,7 @@ router.post('/widget/youtube/channel', passport.authenticate('jwt', {session: fa
   }
 })
 
-router.post('/widget/youtube/comment', passport.authenticate('jwt', {session: false}), (req, res) => {
-  const token = getToken(req.headers)
-  if (token) {
-    const newWidget = new Youtube.Comment({
-      youtube_video: req.body.youtube_video,
-      max_comment: req.body.max_comment,
-      refresh: req.body.refresh
-    })
-    newWidget.save(function (err) {
-      if (err) {
-        return res.json({success: false, msg: 'New widget cannot be saved.'})
-      }
-      saveWidgetID(token, newWidget, res)
-    })
-  } else {
-    return res.status(403).send({success: false, msg: 'Unauthorized.'})
-  }
-})
-
+// The route that manages the creation of the youtubeVideo widget
 router.post('/widget/youtube/video', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -285,6 +276,7 @@ router.post('/widget/youtube/video', passport.authenticate('jwt', {session: fals
   }
 })
 
+// The route that manages the creation of the NYT widget
 router.post('/widget/news', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -304,6 +296,7 @@ router.post('/widget/news', passport.authenticate('jwt', {session: false}), (req
   }
 })
 
+// The route that manages the creation of the Weather widget
 router.post('/widget/weather', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -322,6 +315,7 @@ router.post('/widget/weather', passport.authenticate('jwt', {session: false}), (
   }
 })
 
+// The route that manages the creation of the Reddit widget
 router.post('/widget/reddit', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -342,6 +336,7 @@ router.post('/widget/reddit', passport.authenticate('jwt', {session: false}), (r
   }
 })
 
+// The route that manages the creation of the Hogwarts widget
 router.post('/widget/hogwarts', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -360,6 +355,7 @@ router.post('/widget/hogwarts', passport.authenticate('jwt', {session: false}), 
   }
 })
 
+// The route that manages the creation of the Movies widget
 router.post('/widget/movies', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -378,6 +374,7 @@ router.post('/widget/movies', passport.authenticate('jwt', {session: false}), (r
   }
 })
 
+// The route that manages the creation of the Gw2Gems widget
 router.post('/widget/guildwars2/gems', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -396,6 +393,7 @@ router.post('/widget/guildwars2/gems', passport.authenticate('jwt', {session: fa
   }
 })
 
+// The route that manages the creation of the GW2Delivery widget
 router.post('/widget/guildwars2/delivery', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -414,6 +412,7 @@ router.post('/widget/guildwars2/delivery', passport.authenticate('jwt', {session
   }
 })
 
+// The route that manages the retrieving of the GW2Delivery item by id
 router.get('/widget/guildwars2/delivery/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -433,6 +432,7 @@ router.get('/widget/guildwars2/delivery/:id', passport.authenticate('jwt', {sess
   }
 })
 
+// The route that manages the retrieving of the GW2Delivery item prices by id
 router.get('/widget/guildwars2/delivery/:id/prices', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -452,6 +452,7 @@ router.get('/widget/guildwars2/delivery/:id/prices', passport.authenticate('jwt'
   }
 })
 
+// The route that manages the creation of the GW2Wallet widget
 router.post('/widget/guildwars2/wallet', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
@@ -470,6 +471,7 @@ router.post('/widget/guildwars2/wallet', passport.authenticate('jwt', {session: 
   }
 })
 
+// The route that manages the retrieving of the GW2Wallet currencies informations
 router.get('/widget/guildwars2/wallet/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const token = getToken(req.headers)
   if (token) {
