@@ -14,9 +14,11 @@
             float-label="Choose a widget type"
             v-model="select"
           />
-          <div>
-            <q-input :float-label="params.name" :key="params.name" :type="paramType(params.type)"
-                     v-for="params in widgetParams" v-model="text[params.value]"></q-input>
+          <div v-for="params in widgetParams" :key="params.name">
+            <q-select v-if="params.options" :float-label="params.name"
+                      v-model="text[params.value]" :options="params.options"></q-select>
+            <q-input v-else :float-label="params.name" :type="paramType(params.type)"
+                      v-model="text[params.value]"></q-input>
           </div>
           <div class="row q-mt-md">
             <q-btn @click="validWidget" icon="fas fa-check" v-if="widgetParams"><span style="margin-left: 10px"></span>Create
@@ -97,6 +99,7 @@ export default {
     this.$axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
     this.$axios.get(this.$store.state.server.url + '/about.json')
       .then((response) => {
+        this.$store.state.server.infos = response.data.server
         this.services = response.data.server.services
         for (let service of response.data.server.services) {
           for (let widget of service.widgets) {

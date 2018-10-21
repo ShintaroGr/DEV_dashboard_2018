@@ -102,6 +102,24 @@
               {
                 "name":  "Sort",
                 "type": "string",
+                "options": [
+                  {
+                    "value":  "hot",
+                    "label":  "Hot"
+                  },
+                  {
+                    "value":  "new",
+                    "label":  "New"
+                  },
+                  {
+                    "value":  "rising",
+                    "label":  "Rising"
+                  },
+                  {
+                    "value":  "top",
+                    "label":  "Top"
+                  }
+                ],
                 "value": "sort",
                 "required": false
               }
@@ -145,6 +163,76 @@
                 "name":"City",
                 "value": "city",
                 "type":"string",
+                "options": [
+                  {
+                    "value":  "",
+                    "label":  "Global"
+                  },
+                  {
+                    "value":  "run",
+                    "label":  "Reunion"
+                  },
+                  {
+                    "value":  "bru",
+                    "label":  "Bruxelles"
+                  },
+                  {
+                    "value":  "tir",
+                    "label":  "Tirana"
+                  },
+                  {
+                    "value":  "bar",
+                    "label":  "Barcelona"
+                  },
+                  {
+                    "value":  "tls",
+                    "label":  "Toulouse"
+                  },
+                  {
+                    "value":  "stg",
+                    "label":  "Strasbourg"
+                  },
+                  {
+                    "value":  "ren",
+                    "label":  "Rennes"
+                  },
+                  {
+                    "value":  "par",
+                    "label":  "Paris"
+                  },
+                  {
+                    "value":  "nce",
+                    "label":  "Nice"
+                  },
+                  {
+                    "value":  "nan",
+                    "label":  "Nancy"
+                  },
+                  {
+                    "value":  "ncy",
+                    "label":  "Nancy"
+                  },
+                  {
+                    "value":  "mpl",
+                    "label":  "Montpellier"
+                  },
+                  {
+                    "value":  "mar",
+                    "label":  "Marseille"
+                  },
+                  {
+                    "value":  "lyn",
+                    "label":  "Lyon"
+                  },
+                  {
+                    "value":  "bdx",
+                    "label":  "Bordeaux"
+                  },
+                  {
+                    "value":  "lil",
+                    "label":  "Lille"
+                  }
+                ],
                 "required": true
               },
               {
@@ -169,6 +257,16 @@
                 "name":"Sorting",
                 "value": "sort",
                 "type":"string",
+                "options": [
+                  {
+                    "value":  "upcomming",
+                    "label":  "Upcomming"
+                  },
+                  {
+                    "value":  "now_playing",
+                    "label":  "Now Playing"
+                  }
+                ],
                 "required": true
               },
               {
@@ -193,6 +291,16 @@
                 "name":"Gems Or coins",
                 "value": "gems_or_coins",
                 "type":"string",
+                "options": [
+                  {
+                    "value":  "gems",
+                    "label":  "Gems"
+                  },
+                  {
+                    "value":  "coins",
+                    "label":  "Coins"
+                  }
+                ],
                 "required": true
               },
               {

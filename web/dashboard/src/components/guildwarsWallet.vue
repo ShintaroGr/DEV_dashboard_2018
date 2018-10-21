@@ -8,10 +8,11 @@
           </q-toolbar-title>
         </q-toolbar>
         <div class="layout-padding">
-          <div :key="index" v-for="(info, index) in infos">
-            <div v-if="index !== '_id' && index !== 'type'">
-              <q-input :float-label="index" :type="paramType(infos[index])" v-model="infos[index]"></q-input>
-            </div>
+          <div v-for="params in widgetSchema.params" :key="params.name">
+            <q-select v-if="params.options" :float-label="params.name"
+                      v-model="infos[params.value]" :options="params.options"></q-select>
+            <q-input v-else :float-label="params.name" :type="paramType(params.type)"
+                     v-model="infos[params.value]"></q-input>
           </div>
           <q-btn @click="validateEdit" color="primary">Validate</q-btn>
         </div>
@@ -37,6 +38,7 @@
             <div class="row">
               <div class="col-xs-12 col-sm-2 text-center" v-for="currency in currenciesInfos" :key="currency.id">
                   <q-tooltip>
+                    {{currency.amount}}x
                     {{currency.name}}
                   </q-tooltip>
                   <img :src="currency.icon" height="64px">
@@ -66,10 +68,12 @@ import QTooltip from 'quasar-framework/src/components/tooltip/QTooltip'
 import QChip from 'quasar-framework/src/components/chip/QChip'
 import QCardActions from 'quasar-framework/src/components/card/QCardActions'
 import QScrollArea from 'quasar-framework/src/components/scroll-area/QScrollArea'
+import QSelect from 'quasar-framework/src/components/select/QSelect'
 
 export default {
   name: 'guildwarsWallet',
   components: {
+    QSelect,
     QScrollArea,
     QCardActions,
     QChip,
@@ -91,6 +95,7 @@ export default {
     return {
       isDeleted: false,
       edit: false,
+      widgetSchema: Object,
       infos: Object,
       data: Object,
       refreshTimer: 300,
@@ -198,6 +203,11 @@ export default {
     }
   },
   beforeMount () {
+    this.widgetSchema = this.$store.state.server.infos.services.find((service) => {
+      return service.name === 'guildwars'
+    }).widgets.find((widget) => {
+      return widget.name === 'Guild Wars 2 Wallet'
+    })
     this.start()
   },
   beforeDestroy: function () {

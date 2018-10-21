@@ -12,7 +12,8 @@ const RedditSchema = new Schema({
   },
   sort: {
     type: String,
-    default: 'hot'
+    default: 'hot',
+    enum: ['hot', 'new', 'rising', 'top']
   },
   max_article: {
     type: Number,

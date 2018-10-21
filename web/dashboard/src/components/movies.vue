@@ -8,10 +8,11 @@
           </q-toolbar-title>
         </q-toolbar>
         <div class="layout-padding">
-          <div :key="index" v-for="(info, index) in infos">
-            <div v-if="index !== '_id' && index !== 'type'">
-              <q-input :float-label="index" :type="paramType(infos[index])" v-model="infos[index]"></q-input>
-            </div>
+          <div v-for="params in widgetSchema.params" :key="params.name">
+            <q-select v-if="params.options" :float-label="params.name"
+                      v-model="infos[params.value]" :options="params.options"></q-select>
+            <q-input v-else :float-label="params.name" :type="paramType(params.type)"
+                     v-model="infos[params.value]"></q-input>
           </div>
           <q-btn @click="validateEdit" color="primary">Validate</q-btn>
         </div>
@@ -72,10 +73,12 @@ import QInput from 'quasar-framework/src/components/input/QInput'
 import QCarousel from 'quasar-framework/src/components/carousel/QCarousel'
 import QCarouselSlide from 'quasar-framework/src/components/carousel/QCarouselSlide'
 import QScrollArea from 'quasar-framework/src/components/scroll-area/QScrollArea'
+import QSelect from 'quasar-framework/src/components/select/QSelect'
 
 export default {
-  name: 'hogwarts',
+  name: 'movies',
   components: {
+    QSelect,
     QScrollArea,
     QCarouselSlide,
     QCarousel,
@@ -95,6 +98,7 @@ export default {
     return {
       isDeleted: false,
       edit: false,
+      widgetSchema: Object,
       infos: Object,
       data: Object,
       movies: {},
@@ -201,6 +205,11 @@ export default {
     }
   },
   beforeMount () {
+    this.widgetSchema = this.$store.state.server.infos.services.find((service) => {
+      return service.name === 'movie'
+    }).widgets.find((widget) => {
+      return widget.name === 'Movie List'
+    })
     this.start()
   },
   beforeDestroy: function () {

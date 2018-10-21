@@ -8,10 +8,11 @@
           </q-toolbar-title>
         </q-toolbar>
         <div class="layout-padding">
-          <div :key="index" v-for="(info, index) in infos">
-            <div v-if="index !== '_id' && index !== 'type'">
-              <q-input :float-label="index" :type="paramType(infos[index])" v-model="infos[index]"></q-input>
-            </div>
+          <div v-for="params in widgetSchema.params" :key="params.name">
+            <q-select v-if="params.options" :float-label="params.name"
+                      v-model="infos[params.value]" :options="params.options"></q-select>
+            <q-input v-else :float-label="params.name" :type="paramType(params.type)"
+                     v-model="infos[params.value]"></q-input>
           </div>
           <q-btn @click="validateEdit" color="primary">Validate</q-btn>
         </div>
@@ -63,10 +64,12 @@ import QModalLayout from 'quasar-framework/src/components/modal/QModalLayout'
 import QToolbar from 'quasar-framework/src/components/toolbar/QToolbar'
 import QToolbarTitle from 'quasar-framework/src/components/toolbar/QToolbarTitle'
 import QInput from 'quasar-framework/src/components/input/QInput'
+import QSelect from 'quasar-framework/src/components/select/QSelect'
 
 export default {
   name: 'news',
   components: {
+    QSelect,
     QInput,
     QToolbarTitle,
     QToolbar,
@@ -85,6 +88,7 @@ export default {
     return {
       isDeleted: false,
       edit: false,
+      widgetSchema: Object,
       infos: Object,
       data: Object,
       articles: Array,
@@ -191,6 +195,11 @@ export default {
     }
   },
   beforeMount () {
+    this.widgetSchema = this.$store.state.server.infos.services.find((service) => {
+      return service.name === 'news'
+    }).widgets.find((widget) => {
+      return widget.name === 'New York Times News'
+    })
     this.start()
   },
   beforeDestroy: function () {
